@@ -22,7 +22,6 @@ export default function DataTableNode({ data }: { data: Data }) {
   const { dataStore } = useDataStore((state:any) => state);
   const setDataStore = useDataStore((state:any) => state.setDataStore);
   const { schemaStore } = useSchemaStore((state:any) => state);
-  const { dbCredentials } = useCredentialsStore((state:any) => state);
 
   //split up the table into different parts based on how the data is structured. fetch
   const tableName = tableData[0];

@@ -26,7 +26,6 @@ export default function DataInputModal({
   const [tableName] = useState(tableNameProp);
   const [rowData, setRowData] = useState<DataRowArray>([]);
   const { schemaStore} = useSchemaStore((state:any) => state);
-  const { dbCredentials } = useCredentialsStore((state:any) => state);
   const { dataStore, addTableData } = useDataStore((state:any) => state);
 
   //entire rows we currently have

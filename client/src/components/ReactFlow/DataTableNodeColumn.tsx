@@ -32,7 +32,6 @@ export default function DataTableNodeColumn({
   const newRow = structuredClone(row);
   const [rowData, setRowData] = useState({ ...newRow });
   const [tempData, setTempData] = useState({ ...newRow });
-  const { dbCredentials } = useCredentialsStore((state:any) => state);
   const { schemaStore } = useSchemaStore((state:any) => state);
 
   //reset the state when row changes. Specifically for on-delete functionality.

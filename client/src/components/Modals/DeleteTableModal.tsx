@@ -14,7 +14,6 @@ export default function DeleteTableModal({
   const [tableNames, setTableNames] = useState<string[]>([]);
   const [connectPressed, setConnectPressed] = useState(false);
 
-  const { dbCredentials } = useCredentialsStore((state:any) => state);
   const { schemaStore, setSchemaStore } = useSchemaStore((state:any) => state);
   const { dataStore, setDataStore } = useDataStore((state:any) => state);
   const { setEdges, setNodes } = useFlowStore((state:any) => state);

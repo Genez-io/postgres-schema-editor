@@ -24,7 +24,6 @@ export default function TableNodeColumn({
     (state) => state
   );
   const { setEditRefMode } = useSettingsStore((state:any) => state);
-  const { dbCredentials } = useCredentialsStore((state:any) => state);
 
   // Columns can be in one of three modes: default, edit, or delete
   const [mode, setMode] = useState('default');
