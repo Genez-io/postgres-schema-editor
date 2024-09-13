@@ -1,0 +1,35 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dayjs": "^1.11.13",
+    "express": "^4.21.0",
+    "express-session": "^1.18.0",
+    "path": "^0.12.7",
+    "pg": "^8.12.0",
+    "pino": "^9.4.0",
+    "pino-pretty": "^11.2.2",
+    "serverless-http": "^3.2.0",
+    "typeorm": "^0.3.20",
+    "typescript": "^5.6.2"
+  },
+  "devDependencies": {
+    "@types/body-parser": "^1.19.5",
+    "@types/cookie-parser": "^1.4.7",
+    "@types/cors": "^2.8.17",
+    "@types/express-session": "^1.18.0",
+    "@types/node": "^20.11.15",
+    "@types/pg": "^8.11.9"
+  }
+}
