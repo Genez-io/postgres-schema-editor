@@ -11,7 +11,6 @@ import {
 } from 'react-icons/fa';
 import DataTypeOptions from '../Modals/DataTypeOptions';
 import { ColumnSchema, SQLDataType } from '../../Types.js';
-import useCredentialsStore from '../../store/credentialsStore.js';
 
 export default function TableNodeColumn({
   column,

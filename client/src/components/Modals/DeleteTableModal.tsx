@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import useSchemaStore from '../../store/schemaStore.js';
-import useCredentialsStore from '../../store/credentialsStore.js';
 import useDataStore from '../../store/dataStore.js';
 import useFlowStore from '../../store/flowStore';
 

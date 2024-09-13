@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import useCredentialsStore from '../../store/credentialsStore.js';
 import {
   FaRegEdit,
   FaRegTrashAlt,

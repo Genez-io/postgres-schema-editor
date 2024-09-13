@@ -7,7 +7,6 @@ import useDataStore from '../../store/dataStore.js';
 import useSchemaStore from '../../store/schemaStore.js';
 
 import 'tippy.js/dist/tippy.css';
-import useCredentialsStore from '../../store/credentialsStore.js';
 import { RowsOfData, Data } from '../../Types.js';
 
 export default function DataTableNode({ data }: { data: Data }) {

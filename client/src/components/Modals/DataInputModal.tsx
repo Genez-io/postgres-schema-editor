@@ -1,7 +1,6 @@
 //-----IMPORTED FILES/MODULES
 import { useState } from 'react';
 import useDataStore from '../../store/dataStore.js';
-import useCredentialsStore from '../../store/credentialsStore.js';
 import useSchemaStore from '../../store/schemaStore.js';
 import RowInput from './RowInput';
 
