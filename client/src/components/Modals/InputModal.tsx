@@ -85,9 +85,14 @@ export default function InputModal({
           newColumns: columnData,
         };
         //req to backend to save new table
-        fetch(import.meta.env.VITE_API_URL + `/api/sql/${dbCredentials.db_type}/saveNewTable`, {
+        fetch(import.meta.env.VITE_API_URL + `/api/sql/postgres/saveNewTable`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token'),
+            'Accept-Version': 'genezio-webapp/0.3.0',
+            'Db-Id': localStorage.getItem('dbId') as string
+          },
           body: JSON.stringify(dataToSend),
         })
           .then((responseData) => responseData.json())
@@ -104,9 +109,14 @@ export default function InputModal({
           columnData: columnData,
         };
         //adds new column to the selected table
-        fetch(import.meta.env.VITE_API_URL + `/api/sql/${dbCredentials.db_type}/addColumn`, {
+        fetch(import.meta.env.VITE_API_URL + `/api/sql/postgres/addColumn`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token'),
+            'Accept-Version': 'genezio-webapp/0.3.0',
+            'Db-Id': localStorage.getItem('dbId') as string
+          },
           body: JSON.stringify(dataToSend),
         });
       }

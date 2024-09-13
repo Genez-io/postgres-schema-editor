@@ -48,10 +48,13 @@ export default function DeleteTableModal({
           }
         }
       }
-      await fetch(import.meta.env.VITE_API_URL + `/api/sql/${dbCredentials.db_type}/deleteTable`, {
+      await fetch(import.meta.env.VITE_API_URL + `/api/sql/postgres/deleteTable`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + localStorage.getItem('token'),
+          'Accept-Version': 'genezio-webapp/0.3.0',
+          'Db-Id': localStorage.getItem('dbId') as string
         },
         body: JSON.stringify({ tableName: tableName }),
       });

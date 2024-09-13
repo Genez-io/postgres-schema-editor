@@ -1,5 +1,7 @@
 import { RequestHandler, Request, Response, NextFunction } from 'express';
-import { DataSource } from 'typeorm';
+import pg from 'pg'
+const { Pool } = pg
+const pools:any = {};
 
 // HELPER FUNCTIONS FOR THE HELPER FUNCTIONS
 
@@ -11,38 +13,61 @@ interface NewColumn {
   defaultValue: any;
 }
 
+class Pool2 extends Pool{
+  constructor(d: any) {
+    super(d);
+  }
+  override async query(args: any) {
+    // Add any additional logic here if needed
+    const q = await super.query(args);
+    if (q.rows) {
+      return q.rows;
+    }
+    return q;
+  }
+}
+
 //---------------CONNECT TO THE DATABASE-----------------------------------------------------------------------------------------
-
 export const dbConnect = async (req: Request) => {
-  const { db_type, hostname, password, port, username, database_name, service_name } =
-    req.session;
-  let dbDataSource: DataSource;
+  const authToken = req.headers.authorization?.split(' ')[1];
+  if (!authToken) {
+    throw new Error('No authorization token provided');
+  }
 
-  const commonOptions = {
-    ...(db_type !== 'sqlite' ? { host: hostname as string } : {}),
-    username: username as string,
-    password: password as string,
-    database: database_name as string,
-    synchronize: true,
-    logging: true,
+  const dbId = req.headers['db-id'] as string;
+
+  if (!dbId) {
+    throw new Error('No database name provided');
+  }
+
+  if (!pools[authToken]) {
+    pools[authToken] = {};
+  }
+
+  if (pools[authToken][dbId]) {
+    return pools[authToken][dbId];
+  }
+
+  const response:any = await fetch('https://api.genez.io/databases/' + dbId, {
+    headers: {
+      'Authorization': 'Bearer ' + authToken,
+      'Accept-Version': 'genezio-webapp/0.3.0'
+  }});
+
+  if (!response.ok) {
+    // Handle HTTP errors
+    throw new Error(`HTTP error! Status: ${response.status}`);
+  }
+ 
+  const data = await response.json();
+
+  pools[authToken][dbId] = new Pool2({
+    connectionString: data.connectionUrl,
     ssl: true,
-            extra: {
-                ssl: {
-                    rejectUnauthorized: false,
-                },
-            },
-  };
-
-  dbDataSource = new DataSource({
-    type: 'postgres',
-    host: hostname as string,
-    port: port ? parseInt(port as string) : 5432,
-    ...commonOptions,
   });
 
-  await dbDataSource.initialize();
-  console.log('Data source has been connected');
-  return dbDataSource;
+  return pools[authToken][dbId];
+
 };
 
 //-------------------------------------DATA TABLE ROWS----------------------------------------------------------------------------------------
@@ -54,16 +79,10 @@ export const addNewDbRow: RequestHandler = async (
   next: NextFunction
 ) => {
   const dbDataSource = await dbConnect(req);
-  const { db_type } = req.session;
   const { newRow, tableName } = req.body;
 
   try {
-    const keys: string =
-      db_type === 'oracle'
-        ? Object.keys(newRow)
-            .map((key) => `"${key}"`)
-            .join(', ')
-        : Object.keys(newRow).join(', ');
+    const keys: string = Object.keys(newRow).join(', ');
     const values: string = Object.values(newRow)
       .map((val) => `'${val}'`)
       .join(', ');
@@ -73,18 +92,14 @@ export const addNewDbRow: RequestHandler = async (
     console.log('values: ', values);
 
     const dbAddedRow: Promise<unknown> = await dbDataSource.query(`
-      INSERT INTO ${tableName} (${db_type === 'postgres' ? keys.toLowerCase() : keys})
+      INSERT INTO ${tableName} (${keys.toLowerCase()})
       VALUES (${values})
     `);
 
-    await dbDataSource.destroy();
-    console.log('Database has been disconnected');
     console.log('dbAddedRow in helper: ', dbAddedRow);
     return;
   } catch (err: unknown) {
     console.log('Error occurred in the addNewDbRow middleware: ', err);
-    dbDataSource.destroy();
-    console.log('Database has been disconnected');
     return next(err);
   }
 };
@@ -97,7 +112,6 @@ export const updateRow: RequestHandler = async (
   next: NextFunction
 ) => {
   const dbDataSource = await dbConnect(req);
-  const { db_type } = req.session;
   const { newRow, tableName, primaryKey } = req.body;
 
   try {
@@ -118,31 +132,20 @@ export const updateRow: RequestHandler = async (
       const primaryKeyValue = Object.values(primaryKey);
       const dbUpdatedRow = await dbDataSource.query(`
         UPDATE ${tableName}
-        SET ${db_type === 'oracle' ? oracleKeyValueString : keyValueString}
-        WHERE ${db_type === 'oracle' ? `"${primaryKeyName}"` : primaryKeyName} = ${
-        db_type === 'oracle' || db_type === 'mysql'
-          ? `'${primaryKeyValue}'`
-          : primaryKeyValue
-      }
+        SET ${keyValueString}
+        WHERE ${primaryKeyName} = ${primaryKeyValue}
       `);
-
-      await dbDataSource.destroy();
-      console.log('Database has been disconnected');
       return dbUpdatedRow;
     } else {
       const dbUpdatedRow = await dbDataSource.query(`
       UPDATE ${tableName}
-      SET ${db_type === 'oracle' ? oracleKeyValueString : keyValueString}
+      SET ${keyValueString}
       `);
 
-      await dbDataSource.destroy();
-      console.log('Database has been disconnected');
       return dbUpdatedRow;
     }
   } catch (err: unknown) {
     console.log('Error occurred in the updatedRow middleware: ', err);
-    dbDataSource.destroy();
-    console.log('Database has been disconnected');
     return next(err);
   }
 };
@@ -155,7 +158,6 @@ export const deleteRow: RequestHandler = async (
   next: NextFunction
 ) => {
   const dbDataSource = await dbConnect(req);
-  const { db_type } = req.session;
   const { value, tableName } = req.body;
 
   try {
@@ -173,16 +175,12 @@ export const deleteRow: RequestHandler = async (
 
     await dbDataSource.query(`
       DELETE FROM ${tableName} 
-      WHERE ${db_type === 'oracle' ? oracleKeyValueString : keyValueString}
+      WHERE ${keyValueString}
       `);
 
-    dbDataSource.destroy();
-    console.log('Database has been disconnected');
     return;
   } catch (err: unknown) {
     console.log('Error occurred in the deleteRow middleware: ', err);
-    dbDataSource.destroy();
-    console.log('Database has been disconnected');
     return next(err);
   }
 };
@@ -196,7 +194,6 @@ export const addNewDbColumn: RequestHandler = async (
   next: NextFunction
 ) => {
   const dbDataSource = await dbConnect(req);
-  const { db_type } = req.session;
   const { columnData, tableName } = req.body;
 
   try {
@@ -204,64 +201,25 @@ export const addNewDbColumn: RequestHandler = async (
     let newColumnString: string = '';
 
     columnData.forEach((el: NewColumn) => {
-      if (db_type === 'mssql') {
-        keyValueString += `ALTER TABLE ${tableName} ADD "${el.name}" ${
-          el.type === 'AUTO_INCREMENT' ? 'INT' : el.type
-        }${el.isPrimary ? ' PRIMARY KEY' : ''}${el.isNullable ? '' : ' NOT NULL'}${
-          el.defaultValue ? ` DEFAULT ${el.defaultValue}` : ''
-        }${el.type === 'AUTO_INCREMENT' ? ' AUTO_INCREMENT' : ''}; `;
-      } else if (db_type === 'oracle') {
-        let number: string = '';
-        if (el.type.includes('VARCHAR')) {
-          const regex = /\((\d+)\)/;
-          const match = el.type.match(regex);
-          number = (match as RegExpMatchArray)[1];
-        }
-        keyValueString += `ALTER TABLE ${tableName} ADD(${el.name} ${
-          el.type.includes('VARCHAR') ? `VARCHAR2(${+number})` : el.type
-        }${el.isPrimary ? ' PRIMARY KEY' : ''}${el.isNullable ? '' : ' NOT NULL'}${
-          el.defaultValue ? ` DEFAULT ${el.defaultValue}` : ''
-        }${el.type === 'AUTO_INCREMENT' ? ' AUTO_INCREMENT' : ''}))`;
-      } else {
-        keyValueString += `ADD${db_type === 'postgres' ? ' COLUMN' : ''} ${
-          db_type === 'mysql' ? `${el.name}` : `"${el.name}"`
-        } ${el.type === 'AUTO_INCREMENT' ? 'INT' : el.type}${
-          el.isPrimary ? ' PRIMARY KEY' : ''
-        }${el.isNullable ? '' : ' NOT NULL'}${
-          el.defaultValue ? ` DEFAULT ${el.defaultValue}` : ''
-        }${el.type === 'AUTO_INCREMENT' ? ' AUTO_INCREMENT' : ''}, `;
-      }
+      keyValueString += `ADD COLUMN ${
+        `"${el.name}"`
+      } ${el.type === 'AUTO_INCREMENT' ? 'INT' : el.type}${
+        el.isPrimary ? ' PRIMARY KEY' : ''
+      }${el.isNullable ? '' : ' NOT NULL'}${
+        el.defaultValue ? ` DEFAULT ${el.defaultValue}` : ''
+      }${el.type === 'AUTO_INCREMENT' ? ' AUTO_INCREMENT' : ''}, `;
     });
 
-    if (db_type === 'mssql' || db_type === 'oracle') {
-      newColumnString = keyValueString.slice(0, -1);
-    } else {
-      newColumnString = keyValueString.slice(0, -2);
-    }
+    newColumnString = keyValueString.slice(0, -2);
 
-    if (db_type === 'mssql' || db_type === 'oracle') {
-      const addedNewColumn: Promise<unknown> = await dbDataSource.query(`
-        ${newColumnString}
-        `);
+    const addedNewColumn: Promise<unknown> = await dbDataSource.query(`
+      ALTER TABLE ${tableName}
+      ${newColumnString}
+      `);
 
-      await dbDataSource.destroy();
-      console.log('Database has been disconnected');
-      console.log('addedForeignKey in helper: ', addedNewColumn);
-      return addedNewColumn;
-    } else {
-      const addedNewColumn: Promise<unknown> = await dbDataSource.query(`
-        ALTER TABLE ${tableName}
-        ${newColumnString}
-        `);
-
-      await dbDataSource.destroy();
-      console.log('Database has been disconnected');
-      console.log('addedForeignKey in helper: ', addedNewColumn);
-      return addedNewColumn;
-    }
+    console.log('addedForeignKey in helper: ', addedNewColumn);
+    return addedNewColumn;
   } catch (err: unknown) {
-    console.log('Error occurred in the addedForeignKey middleware: ', err);
-    dbDataSource.destroy();
     console.log('Database has been disconnected');
     return next(err);
   }
@@ -275,26 +233,20 @@ export const updateDbColumn: RequestHandler = async (
   next: NextFunction
 ) => {
   const dbDataSource = await dbConnect(req);
-  const { db_type } = req.session;
-  const { columnName, schemaData, columnData, tableName } = req.body;
+  const { columnName, columnData, tableName } = req.body;
 
   try {
     await dbDataSource.query(`
       UPDATE ${tableName}
-      ${
-        db_type === 'postgres' || db_type === 'microsoft' ? 'ALTER COLUMN' : 'MODIFY'
-      } "${columnName}" ${db_type} ${
+      ALTER COLUMN
+      "${columnName}" postgres ${
       columnData.additional_constraint ? columnData.additional_constraint : ''
     };
       `);
 
-    dbDataSource.destroy();
-    console.log('Database has been disconnected');
     return;
   } catch (err: unknown) {
     console.log('Error occurred in the addedForeignKey middleware: ', err);
-    dbDataSource.destroy();
-    console.log('Database has been disconnected');
     return next(err);
   }
 };
@@ -307,14 +259,13 @@ export const deleteColumn: RequestHandler = async (
   next: NextFunction
 ) => {
   const dbDataSource = await dbConnect(req);
-  const { db_type } = req.session;
   const { columnName, tableName, constraintName } = req.body;
 
   try {
     if (constraintName) {
       await dbDataSource.query(`
         ALTER TABLE ${tableName} 
-        DROP ${db_type === 'mysql' ? 'FOREIGN KEY' : 'CONSTRAINT'} ${constraintName};
+        DROP CONSTRAINT ${constraintName};
         `);
     }
 
@@ -323,14 +274,10 @@ export const deleteColumn: RequestHandler = async (
       DROP COLUMN ${columnName};
       `);
 
-    dbDataSource.destroy();
-    console.log('Database has been disconnected');
     console.log('deletedColumn in helper: ', deletedColumn);
     return deletedColumn;
   } catch (err: unknown) {
     console.log('Error occurred in the addNewTable middleware364: ', err);
-    dbDataSource.destroy();
-    console.log('Database has been disconnected');
     return next(err);
   }
 };
@@ -361,13 +308,9 @@ export const addNewTable: RequestHandler = async (
       ${newTableColumnString}
       )`);
 
-    await dbDataSource.destroy();
-    console.log('Database has been disconnected');
     return;
   } catch (err: unknown) {
     console.log('Error occurred in the addNewTable middleware401: ', err);
-    dbDataSource.destroy();
-    console.log('Database has been disconnected');
     return next(err);
   }
 };
@@ -379,7 +322,6 @@ export const getTableNames: RequestHandler = async (
   next: NextFunction
 ) => {
   const dbDataSource = await dbConnect(req);
-  const { db_type } = req.session;
 
   interface TableNames {
     tablename?: string | undefined; // Postgres
@@ -389,47 +331,17 @@ export const getTableNames: RequestHandler = async (
   }
 
   try {
-    let query: string = '';
-    switch (db_type) {
-      case 'mysql':
-        query = 'SHOW TABLES';
-        break;
-      case 'mssql':
-        query = 'SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES';
-        break;
-      case 'oracle':
-        query = 'SELECT table_name FROM user_tables';
-        break;
-      case 'sqlite':
-        query = "SELECT name FROM sqlite_master WHERE type='table'";
-        break;
-      default:
-        query = "SELECT tableName FROM pg_catalog.pg_tables WHERE schemaname = 'public'"; // Postgres
-    }
+    let query: string = "SELECT tableName FROM pg_catalog.pg_tables WHERE schemaname = 'public'"; // Postgres
 
     const tableNameList: TableNames[] = await dbDataSource.query(query);
 
     const tables: (string | undefined)[] = tableNameList.map((obj: TableNames) => {
-      switch (db_type) {
-        case 'mysql':
-          return obj.Tables_in_user;
-        case 'mssql':
-        case 'oracle':
-          return obj.TABLE_NAME;
-        case 'sqlite':
-          return obj.name;
-        default:
-          return obj.name; // Postgres
-      }
+      return obj.name; // Postgres
     });
 
-    dbDataSource.destroy();
-    console.log('Database has been disconnected');
     return tables;
   } catch (err: unknown) {
     console.log('Error occurred in the addNewTable middleware463: ', err);
-    dbDataSource.destroy();
-    console.log('Database has been disconnected');
     return next(err);
   }
 };
@@ -442,7 +354,6 @@ export const deleteTable: RequestHandler = async (
   next: NextFunction
 ) => {
   const dbDataSource = await dbConnect(req);
-  const { db_type, username } = req.session;
   const { tableName } = req.body;
 
   try {
@@ -450,14 +361,10 @@ export const deleteTable: RequestHandler = async (
       `DROP TABLE ${tableName} CASCADE`
     );
 
-    dbDataSource.destroy();
-    console.log('Database has been disconnected');
     console.log('deletedTable in helper: ', deletedTable);
     return deletedTable;
   } catch (err: unknown) {
     console.log('Error occurred in the addNewTable middleware491: ', err);
-    dbDataSource.destroy();
-    console.log('Database has been disconnected');
     return next(err);
   }
 };
@@ -471,7 +378,6 @@ export const addForeignKey: RequestHandler = async (
   next: NextFunction
 ) => {
   const dbDataSource = await dbConnect(req);
-  const { db_type } = req.session;
   const {
     PrimaryKeyTableName,
     PrimaryKeyColumnName,
@@ -484,26 +390,14 @@ export const addForeignKey: RequestHandler = async (
     const addedForeignKey: Promise<unknown> = await dbDataSource.query(`
       ALTER TABLE ${ForeignKeyTableName}
       ADD CONSTRAINT ${constraintName}
-      FOREIGN KEY (${
-        db_type === 'mssql' || db_type === 'oracle'
-          ? `"${ForeignKeyColumnName}"`
-          : `${ForeignKeyColumnName}`
-      })
-      REFERENCES ${PrimaryKeyTableName} (${
-      db_type === 'mssql' || db_type === 'oracle'
-        ? `"${PrimaryKeyColumnName}"`
-        : `${PrimaryKeyColumnName}`
-    })
+      FOREIGN KEY (${`${ForeignKeyColumnName}`})
+      REFERENCES ${PrimaryKeyTableName} (${`${PrimaryKeyColumnName}`})
       `);
 
-    dbDataSource.destroy();
-    console.log('Database has been disconnected');
     console.log('addedForeignKey in helper: ', addedForeignKey);
     return addedForeignKey;
   } catch (err: unknown) {
     console.log('Error occurred in the addedForeignKey middleware: ', err);
-    dbDataSource.destroy();
-    console.log('Database has been disconnected');
     return next(err);
   }
 };
@@ -516,23 +410,18 @@ export const removeForeignKey: RequestHandler = async (
   next: NextFunction
 ) => {
   const dbDataSource = await dbConnect(req);
-  const { db_type } = req.session;
   const { tableName, constraintName } = req.body;
 
   try {
     const removedForeignKey: Promise<unknown> = await dbDataSource.query(`
       ALTER TABLE ${tableName}
-      DROP ${db_type === 'mysql' ? 'FOREIGN KEY' : 'CONSTRAINT'} ${constraintName}
+      DROP 'CONSTRAINT' ${constraintName}
       `);
 
-    dbDataSource.destroy();
-    console.log('Database has been disconnected');
     console.log('addedForeignKey in helper: ', removedForeignKey);
     return removedForeignKey;
   } catch (err: unknown) {
     console.log('Error occurred in the removedForeignKey middleware: ', err);
-    dbDataSource.destroy();
-    console.log('Database has been disconnected');
     return next(err);
   }
 };

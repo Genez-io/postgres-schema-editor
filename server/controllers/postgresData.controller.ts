@@ -148,13 +148,9 @@ const postgresController = {
       res.locals.data = tableData;
 
       // Disconnecting after data has been received
-      PostgresDataSource.destroy();
-      console.log('Database has been disconnected');
       return next();
     } catch (err: unknown) {
       console.log('Error during Data Source: ', err);
-      PostgresDataSource.destroy();
-      console.log('Database has been disconnected');
       return next(err);
     }
   },

@@ -58,13 +58,6 @@ export default function TableNodeColumn({
     if (column.field_name !== columnData.field_name) {
       delete currentSchema[column.TableName][column.field_name];
     }
-    // await fetch(import.meta.env.VITE_API_URL + `/api/sql/${dbCredentials.db_type}/updateColumn`, {
-    //   method:'PATCH',
-    //   headers:{
-    //     'Content-Type':'application/json'
-    //   },
-    //   body:JSON.stringify({tableName: tableName,  columnName: colRef, schemaData: { ...schemaStore }[tableRef][colRef], columnData: columnData})
-    // })
     setSchemaStore(currentSchema);
     setMode('default');
   };
@@ -91,10 +84,13 @@ export default function TableNodeColumn({
         return;
       }
 
-      await fetch(import.meta.env.VITE_API_URL + `/api/sql/${dbCredentials.db_type}/deleteColumn`, {
+      await fetch(import.meta.env.VITE_API_URL + `/api/sql/postgres/deleteColumn`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + localStorage.getItem('token'),
+          'Accept-Version': 'genezio-webapp/0.3.0',
+          'Db-Id': localStorage.getItem('dbId') as string
         },
         body: JSON.stringify({
           tableName: tableRef,

@@ -27,16 +27,8 @@ const Sidebar = (props: any) => {
 
   //form state hooks
   const [formValues, setFormValues] = useState<{
-    db_type?: string;
-    database_link?: string;
-    hostname?: string;
-    port?: string;
-    username?: string;
-    password?: string;
-    database_name?: string;
-    service_name?: string;
-    file_path?: string;
-  }>({ db_type: 'postgres' });
+    dbId?: string;
+  }>({});
   //END: STATE DECLARATION
 
   if(dbList.length === 1 && dbList[0].label === "Loading...") {
@@ -53,7 +45,7 @@ const Sidebar = (props: any) => {
       
       setDbList(dbList); // Set the options from API response
       if (dbList.length > 0) {
-        setFormValues({database_link: dbList[0].value });
+        setFormValues({dbId: dbList[0].value });
       }
     }).catch((e) => {
       console.error('Error getting database list', e);
@@ -64,38 +56,20 @@ const Sidebar = (props: any) => {
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     const values: any = formValues;
-    //parsing postgres database URL defers from parsing mySQL database URL
-    if (values.database_link) {
-      const response = await axios.get('https://api.genez.io/databases/' + values.database_link, {
-        headers: {
-          'Authorization': 'Bearer ' + localStorage.getItem('token'),
-          'Accept-Version': 'genezio-webapp/0.3.0'
-      }});
-      const fullLink = response.data.connectionUrl.replace('?sslmode=require', '');
-      const splitURI = fullLink.split('/');
-      switch (splitURI[0]) {
-        default: // PostgreSQL
-          const postgresName = splitURI[3];
-          const postgresPort = splitURI[2].split(':')[2];
-          const internalLinkArray_Postgres = splitURI[2].split(':')[1].split('@');
-          values.hostname = internalLinkArray_Postgres[1];
-          values.username = splitURI[2].split(':')[0];
-          values.password = internalLinkArray_Postgres[0];
-          values.port = postgresPort ? postgresPort : '5432';
-          values.database_name = postgresName;
-          values.db_type = 'postgres';
-          break;
-      }
-    }
+    localStorage.setItem('dbId', values.dbId);
 
     //update dbCredentials
     setDbCredentials(values);
     setConnectPressed(true);
 
-    //change between which getSchema from MySQL to postgres based on db_type
-
     const dataFromBackend = await axios
-      .get(import.meta.env.VITE_API_URL + `/api/sql/${values.db_type}/schema`, { params: values })
+      .get(import.meta.env.VITE_API_URL + `/api/sql/postgres/schema`, { 
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('token'),
+          'Accept-Version': 'genezio-webapp/0.3.0',
+          'Db-Id': localStorage.getItem('dbId') as string
+        }
+      })
       .then((res) => {
         return res.data;
       })
@@ -110,12 +84,7 @@ const Sidebar = (props: any) => {
   //on change for db type selection, will affect state to conditionally render database URL
   const handleChange = (event: any) => {
     setSelected(event.target.value);
-    if (event.target.value === 'oracle') {
-      setFormValues({ ...formValues, service_name: 'ORCL' });
-      setDBName('oracle');
-    } else if (event.target.value === 'sqlite') {
-      setDBName('sqlite');
-    } else setDBName('');
+    setDBName('');
   };
   //END: HELPER FUNCTIONS
 
@@ -128,16 +97,16 @@ const Sidebar = (props: any) => {
       <div>
         <div className="form-item">
           <span className="position flex">
-            <label htmlFor="database_link" className="rounded-md dark:text-[#f8f4eb] ">
+            <label htmlFor="dbId" className="rounded-md dark:text-[#f8f4eb] ">
               Database
             </label>
           </span>
           <select
           className="form-box rounded bg-[#f8f4eb] hover:shadow-sm focus:shadow-inner focus:shadow-[#eae7dd]/75 dark:hover:shadow-[#f8f4eb]"
-          id="database_link"
-          name="database_link"
+          id="dbId"
+          name="dbId"
           onChange={(e) => {
-            setFormValues({ ...formValues, database_link: e.target.value });
+            setFormValues({ ...formValues, dbId: e.target.value });
             handleChange(e);
           }}
         >

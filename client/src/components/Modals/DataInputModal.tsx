@@ -47,9 +47,14 @@ export default function DataInputModal({
       newRow: newRow,
     };
     //adds new column to the selected table
-    await fetch(import.meta.env.VITE_API_URL + `/api/sql/${dbCredentials.db_type}/addRow`, {
+    await fetch(import.meta.env.VITE_API_URL + `/api/sql/postgres/addRow`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('token'),
+        'Accept-Version': 'genezio-webapp/0.3.0',
+        'Db-Id': localStorage.getItem('dbId') as string
+    },
       body: JSON.stringify(dataToSend),
     });
   };

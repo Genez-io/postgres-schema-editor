@@ -127,10 +127,13 @@ export default function DataTableNode({ data }: { data: Data }) {
       .concat(restRowsData.slice(index + 1, restRowsData.length));
     newDatastore[tableName] = restRowsData;
 
-    await fetch(import.meta.env.VITE_API_URL + `/api/sql/${dbCredentials.db_type}/deleteRow`, {
+    await fetch(import.meta.env.VITE_API_URL + `/api/sql/postgres/deleteRow`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('token'),
+        'Accept-Version': 'genezio-webapp/0.3.0',
+        'Db-Id': localStorage.getItem('dbId') as string
       },
       body: JSON.stringify({ tableName: tableName, value: value }),
     })
