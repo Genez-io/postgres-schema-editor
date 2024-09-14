@@ -4,7 +4,7 @@ import useSettingsStore from '../../store/settingsStore.js';
 import useCredentialsStore from '../../store/credentialsStore.js';
 import { InnerReference } from '../../Types.js';
 
-const AddReference: React.FC = () => {
+const AddReference: React.FC<{dbId: string}> = ({ dbId }) => {
   const { currentTable, currentColumn, setEditRefMode } = useSettingsStore((state:any) => state);
   const { schemaStore, addForeignKeySchema, setSchemaStore } = useSchemaStore((state:any) => state);
   const { dbCredentials } = useCredentialsStore((state:any) => state);
@@ -68,7 +68,7 @@ const AddReference: React.FC = () => {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + localStorage.getItem('token'),
           'Accept-Version': 'genezio-webapp/0.3.0',
-          'Db-Id': localStorage.getItem('dbId') as string
+          'Db-Id': dbId
         },
         body: JSON.stringify(updatedForeignKey)
       })

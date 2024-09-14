@@ -8,16 +8,6 @@ const routes = (app: Express) => {
 
   app.use('/api/sql/postgres', postgresRouter);
 
-  app.get('/api/dbList', (_req: Request, res: Response) => {
-    let ret:any = [];
-    for (const key in process.env) {
-      if (key.includes('DATABASE_URL')) {
-        ret.push({label: key, value: process.env[key]});
-      }
-    } 
-    res.send(ret);
-  });
-
   app.get('/*', (_req, res) => {
     res.status(404).send('Not found');
   });

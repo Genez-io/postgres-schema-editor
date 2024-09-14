@@ -11,6 +11,7 @@ type InputModalProps = {
   mode: 'table' | 'column';
   closeInputModal: () => void;
   tableNameProp?: string;
+  dbId: string;
 };
 
 interface Column {
@@ -33,6 +34,7 @@ export default function InputModal({
   mode,
   closeInputModal,
   tableNameProp,
+  dbId
 }: InputModalProps) {
   // TODO: separate state for table name and column data
   // TODO: FORCE USER TO CHOOSE ONE AND ONLY ONE COLUMN AS PK WHEN CREATING TABLE
@@ -91,7 +93,7 @@ export default function InputModal({
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + localStorage.getItem('token'),
             'Accept-Version': 'genezio-webapp/0.3.0',
-            'Db-Id': localStorage.getItem('dbId') as string
+            'Db-Id': dbId as string
           },
           body: JSON.stringify(dataToSend),
         })
@@ -115,7 +117,7 @@ export default function InputModal({
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + localStorage.getItem('token'),
             'Accept-Version': 'genezio-webapp/0.3.0',
-            'Db-Id': localStorage.getItem('dbId') as string
+            'Db-Id': dbId as string
           },
           body: JSON.stringify(dataToSend),
         });

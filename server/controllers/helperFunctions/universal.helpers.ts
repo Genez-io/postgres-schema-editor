@@ -92,7 +92,7 @@ export const addNewDbRow: RequestHandler = async (
     console.log('values: ', values);
 
     const dbAddedRow: Promise<unknown> = await dbDataSource.query(`
-      INSERT INTO ${tableName} (${keys.toLowerCase()})
+      INSERT INTO ${tableName} (${keys})
       VALUES (${values})
     `);
 
@@ -115,17 +115,14 @@ export const updateRow: RequestHandler = async (
   const { newRow, tableName, primaryKey } = req.body;
 
   try {
-    console.log('req.body: ', req.body);
     const updateKeys = Object.keys(newRow);
     const updateValues = Object.values(newRow);
-    let oracleKeyValueString = '';
+    let keyValueString = '';
     for (let i = 0; i < updateKeys.length; i++) {
-      oracleKeyValueString += `"${updateKeys[i]}" = '${updateValues[i]}'${
+      keyValueString += `"${updateKeys[i]}" = '${updateValues[i]}'${
         i < updateKeys.length - 1 ? ', ' : ''
       }`;
     }
-
-    const keyValueString = oracleKeyValueString.replace(/"/g, '');
 
     if (primaryKey) {
       const primaryKeyName = Object.keys(primaryKey);

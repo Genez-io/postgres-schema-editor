@@ -5,9 +5,11 @@ import useFlowStore from '../../store/flowStore';
 
 type DeleteTableModalProps = {
   closeDeleteTableModal: () => void;
+  dbId: string;
 };
 export default function DeleteTableModal({
   closeDeleteTableModal,
+  dbId
 }: DeleteTableModalProps) {
   const [tableName, setTableName] = useState<string>('');
   const [tableNames, setTableNames] = useState<string[]>([]);
@@ -32,7 +34,6 @@ export default function DeleteTableModal({
     fetchTableNames();
   }, []);
 
-  //modified to fix bugs by dbspy 7.0
   const deleteTable = async (): Promise<void> => {
     try {
       setConnectPressed(true);
@@ -52,7 +53,7 @@ export default function DeleteTableModal({
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + localStorage.getItem('token'),
           'Accept-Version': 'genezio-webapp/0.3.0',
-          'Db-Id': localStorage.getItem('dbId') as string
+          'Db-Id': dbId
         },
         body: JSON.stringify({ tableName: tableName }),
       });

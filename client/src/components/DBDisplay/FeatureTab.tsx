@@ -1,54 +1,34 @@
 // React & React Router & React Query Modules
 import { useState, useRef } from 'react';
-import axios, { AxiosResponse } from 'axios';
 
 // Stores imported:
-import useDataStore from '../../store/dataStore.js';
 import useSchemaStore from '../../store/schemaStore.js';
 import useFlowStore from '../../store/flowStore.js';
 import useSettingsStore from '../../store/settingsStore.js';
 //import icon
 import {
-  ConnectDatabaseIcon,
   AddTableIcon,
   DeleteTableIcon,
 } from '../../FeatureTabIcon';
 // Components imported:
-import QueryModal from '../Modals/QueryModal.js';
-import DbNameInput from '../Modals/DbNameInput.js';
 import LoadDbModal from '../Modals/LoadDbModal.js';
-import DeleteDbModal from '../Modals/DeleteDbModal.js';
 
 /** "FeatureTab" Component - a tab positioned in the left of the page to access features of the app; */
 export default function FeatureTab(props: any) {
-  //STATE DECLARATION (dbSpy3.0)
   const { setEdges, setNodes } = useFlowStore((state:any) => state);
-
-  const { dataStore, setDataStore } = useDataStore((state:any) => state);
-
-  const { schemaStore, setSchemaStore} = useSchemaStore(
+  const { schemaStore } = useSchemaStore(
     (state:any) => state
   );
 
-  const { setWelcome, isSchema, setDarkMode, darkMode, setDBName } = useSettingsStore(
+  const { setWelcome, setDarkMode, darkMode } = useSettingsStore(
     (state:any) => state
   );
-  const [action, setAction] = useState(new Array());
-  const [queryModalOpened, setQueryModalOpened] = useState(false);
-  const [saveDbNameModalOpened, setSaveDbNameModalOpened] = useState(false);
-  const [loadDbModalOpened, setLoadDbModalOpened] = useState(false);
-  const [deleteDbModalOpened, setDeleteDbModalOpened] = useState(false);
-  const [nameArr] = useState<string[]>([]);
+  const [action] = useState(new Array());
+  const [loadDbModalOpened, setLoadDbModalOpened] = useState(true);
   //END: STATE DECLARATION
 
   //create references for HTML elements
   const confirmModal: any = useRef();
-  /* When the user clicks, open the modal */
-  const openModal: any = (callback: any) => {
-    confirmModal.current.style.display = 'block';
-    confirmModal.current.style.zIndex = '100';
-    setAction([callback]);
-  };
   /* When the user clicks 'yes' or 'no', close it */
   const closeModal: any = (response: boolean) => {
     confirmModal.current.style.display = 'none';
@@ -57,114 +37,15 @@ export default function FeatureTab(props: any) {
 
   // HELPER FUNCTIONS
 
-  const connectDb = () => {
-    //if Flow is rendered, openModal
-    if (document.querySelector('.flow')) openModal(props.handleSidebar);
-    else props.handleSidebar();
-  };
-
   const buildDatabase = () => {
     setNodes([]);
     setEdges([]);
     setWelcome(false);
   };
 
-  const closeQueryModal = () => {
-    setQueryModalOpened(false);
-  };
-
-  const closeSaveDbNameModal = (input?: string) => {
-    //pull dbName from input field and send it to the database along with the schema. - dbSpy 7.0
-    if (input) {
-      saveSchema(input);
-    }
-    setSaveDbNameModalOpened(false);
-  };
-
-  // Load selected database - dbSpy 7.0
-  const closeLoadDbModal = (input?: string) => {
-    if (input) {
-      loadSchema(input);
-      setDBName(input);
-    }
+  const closeLoadDbModal = () => {
     setLoadDbModalOpened(false);
   };
-  // Delete selected database - dbSpy 7.0
-  const closeDeleteDbModal = (input?: string) => {
-    if (input) {
-      deleteDatabase(input);
-    }
-    setDeleteDbModalOpened(false);
-  };
-
-  // Function for saving databases. Reworked for multiple saves - dbspy 7.0
-  const saveSchema = (inputName: string): void => {
-    //check to see if a table is present in the schemaStore
-    if (Object.keys(schemaStore).length !== 0) {
-      //Create request body with the schema to be saved and the inputted name to save it under
-      const postBody = {
-        schema: JSON.stringify(schemaStore),
-        SaveName: inputName,
-        TableData: JSON.stringify(dataStore),
-      };
-      //make a get request to see if the name already exists in the database
-      axios
-        .get<string[]>('/api/saveFiles/allSave')
-        .then((res: AxiosResponse) => {
-          const nameArr = [];
-          for (let saveName of res.data.data) {
-            nameArr.push(saveName.SaveName);
-          }
-          // if the name already exists then send to one route and if not then send to the other
-          // route with combined middleware.
-          if (nameArr.includes(inputName)) {
-            axios
-              .patch('/api/saveFiles/save', postBody)
-              .catch((err) => console.error('err', err));
-          } else {
-            axios
-              .post('/api/saveFiles/CreateAndSave', postBody)
-              .catch((err) => console.error('err', err));
-          }
-        })
-        .catch((err) => console.error('Err', err));
-    } else {
-      //if no table is present, send alert to the user
-      alert('No schema displayed.');
-    }
-  };
-
-  // Reworked for multiple loads -  dbSpy 7.0
-  const loadSchema = async (inputName: string) => {
-    try {
-      //send the inputName along with the get request as query in the parameters.
-      const data = await fetch(`/api/saveFiles/loadSave?SaveName=${inputName}`);
-      if (data.status === 204) return alert('No database stored!');
-      const schemaString = await data.json();
-
-      setDataStore(JSON.parse(schemaString.tableData));
-
-      return setSchemaStore(JSON.parse(schemaString.data));
-    } catch (err) {
-      console.log(err);
-      console.error('err retrieve', err);
-      window.alert(err);
-    }
-  };
-  // Function for deleting databases - dbspy 7.0
-  const deleteDatabase = (inputName: string) => {
-    try {
-      //send the inputName along with the delete request as query in the parameters.
-      axios
-        .delete(`/api/saveFiles/deleteSave/${inputName}`)
-        .catch((err) => console.error('err', err));
-    } catch (err) {
-      console.log(err);
-      console.error('err retrieve', err);
-      window.alert(err);
-    }
-  };
-
 
   //Toggle function for DarkMode
   const toggleClass = (): void => {
@@ -207,25 +88,8 @@ export default function FeatureTab(props: any) {
               </div>
             </button>
 
-            <p className=" mt-4 text-slate-900 dark:text-[#f8f4eb]">Action</p>
-            <hr />
             <ul className=" space-y-0">
-              <li>
-                <a
-                  onClick={connectDb}
-                  className="dark: group flex cursor-pointer items-center rounded-lg p-2 text-sm font-normal text-gray-900 hover:text-yellow-500 hover:underline dark:text-[#f8f4eb] dark:hover:text-yellow-300"
-                  data-testid="connect-database"
-                >
-                  <ConnectDatabaseIcon />
-                  <span className="ml-3">Connect Database</span>
-                </a>
-              </li>
-              {/* TODO: Add SAVE feature */}
-
-              <br />
-              <p className="text-slate-900 dark:text-[#f8f4eb]">Edit</p>
-              <hr />
-              {isSchema ? (
+              {!loadDbModalOpened ? (
                 <li>
                   <a
                     onClick={() => {
@@ -288,15 +152,8 @@ export default function FeatureTab(props: any) {
 
         {/* Query Output Modal */}
         {/* Sending props to child components. */}
-        {queryModalOpened ? <QueryModal closeQueryModal={closeQueryModal} /> : null}
-        {saveDbNameModalOpened ? (
-          <DbNameInput closeSaveDbNameModal={closeSaveDbNameModal} />
-        ) : null}
         {loadDbModalOpened ? (
-          <LoadDbModal nameArr={nameArr} closeLoadDbModal={closeLoadDbModal} />
-        ) : null}
-        {deleteDbModalOpened ? (
-          <DeleteDbModal nameArr={nameArr} closeDeleteDbModal={closeDeleteDbModal} />
+          <LoadDbModal dbId={props.dbId} closeLoadDbModal={closeLoadDbModal} />
         ) : null}
       </div>
     </>

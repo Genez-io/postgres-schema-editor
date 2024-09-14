@@ -91,7 +91,7 @@ export default function Flow(): JSX.Element {
         edges={edges}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
-        onNodeClick={handleNodeClick} // dbSpy 7.0
+        onNodeClick={handleNodeClick}
         nodeTypes={nodeTypes}
         fitView
       >

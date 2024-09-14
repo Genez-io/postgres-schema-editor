@@ -95,7 +95,7 @@ export default function DataFlow(): JSX.Element {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
-        onNodeClick={handleNodeClick} // dbSpy 7.0
+        onNodeClick={handleNodeClick}
         nodeTypes={nodeTypes}
         fitView
       >

@@ -7,7 +7,7 @@ import { BsFillCameraFill } from 'react-icons/bs';
 function downloadImage(dataUrl:string) {
   const a = document.createElement('a');
 
-  a.setAttribute('download', 'dbSpy-reactflow.png');
+  a.setAttribute('download', 'schema.png');
   a.setAttribute('href', dataUrl);
   a.click();
 }

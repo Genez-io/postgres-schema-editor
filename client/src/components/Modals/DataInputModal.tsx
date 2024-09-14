@@ -9,6 +9,7 @@ type InputDataModalProps = {
   mode: string;
   closeDataInputModal: () => void;
   tableNameProp?: string;
+  dbId: string;
 };
 
 type DataObj = {
@@ -21,6 +22,7 @@ type DataRowArray = Array<string | number | boolean | null>;
 export default function DataInputModal({
   closeDataInputModal,
   tableNameProp,
+  dbId,
 }: InputDataModalProps) {
   const [tableName] = useState(tableNameProp);
   const [rowData, setRowData] = useState<DataRowArray>([]);
@@ -51,7 +53,7 @@ export default function DataInputModal({
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + localStorage.getItem('token'),
         'Accept-Version': 'genezio-webapp/0.3.0',
-        'Db-Id': localStorage.getItem('dbId') as string
+        'Db-Id': dbId
     },
       body: JSON.stringify(dataToSend),
     });

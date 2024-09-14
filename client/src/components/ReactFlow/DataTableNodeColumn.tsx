@@ -93,13 +93,15 @@ export default function DataTableNodeColumn({
     setRowData({ ...tempData });
     setMode('default');
 
+    const dbId = window.location.href.replace(/.*edit\//, '');
+
     await fetch(import.meta.env.VITE_API_URL + `/api/sql/postgres/updateRow`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + localStorage.getItem('token'),
         'Accept-Version': 'genezio-webapp/0.3.0',
-        'Db-Id': localStorage.getItem('dbId') as string
+        'Db-Id': dbId as string
       },
       body: JSON.stringify(changes),
     })

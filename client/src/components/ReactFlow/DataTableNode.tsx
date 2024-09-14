@@ -48,39 +48,6 @@ export default function DataTableNode({ data }: { data: Data }) {
     }
   }
 
-  /////////////// FOR EDGE CASE CONSTRAINT THAT PREVENT ROW DELETED THAT HAS A FOREIGN KEY REFERENCING TO THAT ROW ////////////
-  // UseEffect on Mount to grab all the Foreign Key reference and store it in reference store because of constraint, *cant delete the row that has
-  // a foreign key referenced to it.
-  // useEffect(()=>{
-
-  //   //loop through all of the schemastore in current table to grab all the schema info referencing foreignkey
-  //   for(let columnKey in schemaName){
-  //     if(schemaName[columnKey].References[0]){
-
-  //       const toForeignKey = {};
-  //       const fromForeignKey = new Set();
-  //       const toTableName:string = schemaName[columnKey].References[0].PrimaryKeyTableName.replace('public.',"");
-  //       const toColumnName:string = schemaName[columnKey].References[0].PrimaryKeyName;
-  //       const fromTableName:string = schemaName[columnKey].References[0].ReferencesTableName.replace('public.',"");
-  //       const fromColumnName:string = schemaName[columnKey].References[0].ReferencesPropertyName;
-
-  //       //loop throw all of the Rowdata and grab data if there is a corresponding foreign key
-  //       for(let i = 0; i < RowData.length; i++){
-  //         if(RowData[i][fromColumnName] !== null){
-  //           fromForeignKey.add(RowData[i][fromColumnName]);
-  //         }
-  //       }
-  //       //assign to the state reference store
-  //       toForeignKey[toTableName] = {[toColumnName]:fromForeignKey};
-  //       const currentRef = structuredClone(referenceStore);
-  //       //console.log('prereference' ,referenceStore)
-  //       setReferenceStore({...currentRef,...toForeignKey});
-  //       //console.log('post reference',referenceStore) //// ** State of referenceStore is not updating right away after setting referenceStore, only update on page mount?
-  //     }
-  //    }
-  //  },[dataStore])
-  //////////////////////////////////////////////////////
-
   //check if
   if (schemaName !== undefined) {
     secondaryFirstRow = Object.keys(schemaStore[tableName]);
@@ -124,6 +91,7 @@ export default function DataTableNode({ data }: { data: Data }) {
       .slice(0, index)
       .concat(restRowsData.slice(index + 1, restRowsData.length));
     newDatastore[tableName] = restRowsData;
+    const dbId = window.location.href.replace(/.*edit\//, '')
 
     await fetch(import.meta.env.VITE_API_URL + `/api/sql/postgres/deleteRow`, {
       method: 'DELETE',
@@ -131,7 +99,7 @@ export default function DataTableNode({ data }: { data: Data }) {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + localStorage.getItem('token'),
         'Accept-Version': 'genezio-webapp/0.3.0',
-        'Db-Id': localStorage.getItem('dbId') as string
+        'Db-Id': dbId as string
       },
       body: JSON.stringify({ tableName: tableName, value: value }),
     })
