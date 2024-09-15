@@ -17,12 +17,15 @@ class Pool2 extends Pool{
   constructor(d: any) {
     super(d);
   }
-  override async query(args: any) {
+  override async query(query: any, values?: any): Promise<any> {
     // Add any additional logic here if needed
-    const q = await super.query(args);
-    if (q.rows) {
+    console.log("query: ", query);
+    if (values)
+      console.log("values: ", values);
+
+    const q = await super.query(query, values);
+    if (q.rows)
       return q.rows;
-    }
     return q;
   }
 }
@@ -82,19 +85,16 @@ export const addNewDbRow: RequestHandler = async (
   const { newRow, tableName } = req.body;
 
   try {
-    const keys: string = Object.keys(newRow).join(', ');
-    const values: string = Object.values(newRow)
-      .map((val) => `'${val}'`)
+
+    const keys: string = Object.keys(newRow)
+      .map((key) => `"${key}"`)
       .join(', ');
 
-    console.log('tablename: ', tableName);
-    console.log('keys: ', keys);
-    console.log('values: ', values);
+    const values = Object.values(newRow);
+    const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+    const query = `INSERT INTO ${tableName} (${keys}) VALUES (${placeholders})`;
 
-    const dbAddedRow: Promise<unknown> = await dbDataSource.query(`
-      INSERT INTO ${tableName} (${keys})
-      VALUES (${values})
-    `);
+    const dbAddedRow = await dbDataSource.query(query, values);
 
     console.log('dbAddedRow in helper: ', dbAddedRow);
     return;
@@ -105,7 +105,6 @@ export const addNewDbRow: RequestHandler = async (
 };
 
 //-----------------UPDATE ROW--------------------------------------------------------------------------------------------------
-
 export const updateRow: RequestHandler = async (
   req: Request,
   _res: Response,
@@ -117,32 +116,32 @@ export const updateRow: RequestHandler = async (
   try {
     const updateKeys = Object.keys(newRow);
     const updateValues = Object.values(newRow);
-    let keyValueString = '';
-    for (let i = 0; i < updateKeys.length; i++) {
-      keyValueString += `"${updateKeys[i]}" = '${updateValues[i]}'${
-        i < updateKeys.length - 1 ? ', ' : ''
-      }`;
-    }
+
+    // Create the SET clause using parameterized query placeholders
+    const setClause = updateKeys
+      .map((key, index) => `"${key}" = $${index + 1}`)
+      .join(', ');
+
+    // Add values for the parameterized query
+    const values = [...updateValues];
+
+    let query = `UPDATE ${tableName} SET ${setClause}`;
 
     if (primaryKey) {
-      const primaryKeyName = Object.keys(primaryKey);
-      const primaryKeyValue = Object.values(primaryKey);
-      const dbUpdatedRow = await dbDataSource.query(`
-        UPDATE ${tableName}
-        SET ${keyValueString}
-        WHERE ${primaryKeyName} = ${primaryKeyValue}
-      `);
-      return dbUpdatedRow;
-    } else {
-      const dbUpdatedRow = await dbDataSource.query(`
-      UPDATE ${tableName}
-      SET ${keyValueString}
-      `);
+      const primaryKeyName = Object.keys(primaryKey)[0];
+      const primaryKeyValue = Object.values(primaryKey)[0];
 
-      return dbUpdatedRow;
+      // Add primary key value as the next parameter for the query
+      values.push(primaryKeyValue);
+
+      query += ` WHERE "${primaryKeyName}" = $${values.length}`;
     }
+
+    const dbUpdatedRow = await dbDataSource.query(query, values);
+
+    return dbUpdatedRow;
   } catch (err: unknown) {
-    console.log('Error occurred in the updatedRow middleware: ', err);
+    console.log('Error occurred in the updateRow middleware: ', err);
     return next(err);
   }
 };
@@ -158,26 +157,24 @@ export const deleteRow: RequestHandler = async (
   const { value, tableName } = req.body;
 
   try {
+    // Prepare key-value pairs for the DELETE condition, excluding null values
     const deleteEntries = Object.entries(value).filter(([_key, value]) => value !== null);
     const deleteKeys = deleteEntries.map(([key, _value]) => key);
-    const deleteValues = deleteEntries.map(([_key, value]) => value);
+    const values = deleteEntries.map(([_key, value]) => value);
 
-    let oracleKeyValueString = '';
-    for (let i = 0; i < deleteKeys.length; i++) {
-      oracleKeyValueString += `"${deleteKeys[i]}" = '${deleteValues[i]}'${
-        i < deleteKeys.length - 1 ? ' AND ' : ''
-      }`;
-    }
-    const keyValueString = oracleKeyValueString.replace(/"/g, '');
+    // Create the WHERE clause using parameterized placeholders
+    const conditions = deleteKeys
+      .map((key, index) => `"${key}" = $${index + 1}`)
+      .join(' AND ');
 
-    await dbDataSource.query(`
-      DELETE FROM ${tableName} 
-      WHERE ${keyValueString}
-      `);
+    const query = `DELETE FROM ${tableName} WHERE ${conditions}`;
+
+    // Use parameterized query with pg
+    await dbDataSource.query(query, values);
 
     return;
   } catch (err: unknown) {
-    console.log('Error occurred in the deleteRow middleware: ', err);
+    console.log('Error occurred in the deleteRow middleware: ', err instanceof Error ? err.message : err);
     return next(err);
   }
 };
@@ -233,13 +230,14 @@ export const updateDbColumn: RequestHandler = async (
   const { columnName, columnData, tableName } = req.body;
 
   try {
-    await dbDataSource.query(`
+    const query = `
       UPDATE ${tableName}
       ALTER COLUMN
       "${columnName}" postgres ${
       columnData.additional_constraint ? columnData.additional_constraint : ''
-    };
-      `);
+    };`;
+    await dbDataSource.query(query);
+    console.log('updatedColumn in helper');
 
     return;
   } catch (err: unknown) {
@@ -260,10 +258,11 @@ export const deleteColumn: RequestHandler = async (
 
   try {
     if (constraintName) {
-      await dbDataSource.query(`
+      let query = `
         ALTER TABLE ${tableName} 
         DROP CONSTRAINT ${constraintName};
-        `);
+        `;
+      await dbDataSource.query(query);
     }
 
     const deletedColumn: Promise<unknown> = await dbDataSource.query(`
@@ -387,8 +386,8 @@ export const addForeignKey: RequestHandler = async (
     const addedForeignKey: Promise<unknown> = await dbDataSource.query(`
       ALTER TABLE ${ForeignKeyTableName}
       ADD CONSTRAINT ${constraintName}
-      FOREIGN KEY (${`${ForeignKeyColumnName}`})
-      REFERENCES ${PrimaryKeyTableName} (${`${PrimaryKeyColumnName}`})
+      FOREIGN KEY ("${`${ForeignKeyColumnName}`}")
+      REFERENCES ${PrimaryKeyTableName} ("${`${PrimaryKeyColumnName}`}")
       `);
 
     console.log('addedForeignKey in helper: ', addedForeignKey);
