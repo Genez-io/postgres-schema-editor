@@ -121,14 +121,14 @@ export default function DataInputModal({
         <div className="mx-auto flex w-[50%] max-w-[200px] justify-between">
           <button
             type="button"
-            className="modalButton text-slate-900 hover:opacity-70 dark:text-[#f8f4eb]"
+            className="btn"
             onClick={closeDataInputModal}
             data-testid="modal-cancel"
           >
             Cancel
           </button>
           <button
-            className="modalButton text-slate-900 hover:opacity-70 dark:text-[#f8f4eb]"
+            className="btn primary"
             data-testid="modal-submit"
           >
             Add Row

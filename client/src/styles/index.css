@@ -618,9 +618,16 @@ select:focus {
 /* Modal Content/Box */
 .modal-content {
   margin: 15% auto;
-  /* 15% from the top and centered */
   padding: 20px;
-  /* Could be more or less, depending on screen size */
+  border: 2px solid #4e5a5e;
+}
+
+.modal-content label {
+  margin-right: 5px;
+}
+
+.modal-content .column-input > div {
+  margin: 0 5px;
 }
 
 .navItems {
@@ -679,6 +686,10 @@ select:focus {
 
 .column-header h1 {
   font-size: 1.3rem;
+}
+
+.dark h1 {
+  color: #f8f4eb;
 }
 
 .column-header button {
@@ -788,6 +799,13 @@ button.btn {
   user-select: none;
   background-color: transparent;
   border-radius: 5px;
+}
+
+button.btn.primary {
+  font-weight: 700;
+}
+button.red {
+  background-color: rgb(128, 0, 0);
 }
 
 button.btn:hover {

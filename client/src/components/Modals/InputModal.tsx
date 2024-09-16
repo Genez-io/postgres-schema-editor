@@ -241,7 +241,7 @@ export default function InputModal({
           {dbCredentials.db_type !== 'oracle' ? (
             <button
               type="button"
-              className="text-slate-900 dark:text-[#f8f4eb]"
+              className="btn"
               onClick={addColumn}
               data-testid="add-table-add-column"
             >
@@ -253,14 +253,14 @@ export default function InputModal({
         <div className="mx-auto flex w-[50%] max-w-[200px] justify-between">
           <button
             type="button"
-            className="modalButton border-slate-500 text-slate-900 hover:opacity-70 dark:text-[#f8f4eb]"
+            className="btn"
             onClick={closeInputModal}
             data-testid="modal-cancel"
           >
             Cancel
           </button>
           <button
-            className="modalButton text-slate-900 hover:opacity-70 dark:text-[#f8f4eb]"
+            className="btn primary"
             data-testid="modal-submit"
           >
             {mode === 'table' ? 'Create Table' : 'Submit'}

@@ -111,7 +111,7 @@ function ColumnInput({
             className=" text-center text-slate-900 dark:text-[#f8f4eb]"
             htmlFor={`column-${index}-primary`}
           >
-            Primary Key
+            PK
           </label>
           <input
             type="checkbox"

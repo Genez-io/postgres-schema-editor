@@ -58,7 +58,7 @@ export default function FeatureTab(props: any) {
 
   return (
     <>
-      <button 
+      {/* <button 
         className="btn"
         onClick={toggleClass}>
           <div className='ItemLink group inline-flex items-center justify-start gap-0 rounded-lg'>
@@ -79,7 +79,7 @@ export default function FeatureTab(props: any) {
           </svg>
           <span className="ml-3 flex-1 whitespace-nowrap">{darkMode === true ? 'Light' : 'Dark'} Mode</span>
         </div>
-      </button>
+      </button> */}
 
       {!loadDbModalOpened ? (
         <button

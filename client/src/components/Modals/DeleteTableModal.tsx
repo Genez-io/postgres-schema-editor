@@ -88,7 +88,7 @@ export default function DeleteTableModal({
               <button
                 value={name}
                 onClick={() => setTableName(name)}
-                className="rounded-md bg-red-500 px-2 py-1 text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+                className="btn red"
               >
                 Delete
               </button>
@@ -110,13 +110,13 @@ export default function DeleteTableModal({
                       deleteTable();
                       setTableName('');
                     }}
-                    className="rounded-md border-2 border-red-400 bg-red-500 px-2 py-1 text-white hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 dark:text-[#f8f4eb]"
+                    className="btn red"
                   >
                     Confirm
                   </button>{' '}
                   <button
                     onClick={() => setTableName('')}
-                    className="rounded-md border-2 border-slate-500 px-2 py-1 text-slate-900 hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50 dark:text-[#f8f4eb]"
+                    className="btn"
                   >
                     Return
                   </button>
@@ -127,7 +127,7 @@ export default function DeleteTableModal({
             <div className="flex justify-center">
               <button
                 type="button"
-                className="modalButton text-slate-900 hover:opacity-70 dark:text-[#f8f4eb] "
+                className="btn"
                 onClick={async (e) => {
                   e.preventDefault();
                   setTableNames([]);
