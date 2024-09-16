@@ -1,6 +1,7 @@
 //-----IMPORTED FILES/MODULES
 import { SchemaStore } from '../../store/schemaStore.js';
 import { Edge, DataNode } from '../../Types.js';
+import dagre from 'dagre';
 
 export default function createNodes(
   schemaObject: SchemaStore,
@@ -8,24 +9,71 @@ export default function createNodes(
 ): DataNode[] {
   // renders each table on the React Flow schema canvas
   const nodes: DataNode[] = [];
+  const dbId = localStorage.getItem('dbId') || '';
+  const spStr = localStorage.getItem(dbId);
+  let sp:any;
+  if (spStr) {
+    sp = JSON.parse(spStr);
+  }
 
-  let x: number = 0;
-  let y: number = 0;
+  let nodeWidth = 500;
+  let direction = 'TB';
+
+  const dagreGraph = new dagre.graphlib.Graph();
+  dagreGraph.setDefaultEdgeLabel(() => ({}));
+
+  //const isHorizontal = direction === 'LR';
+  dagreGraph.setGraph({ rankdir: direction });
 
   for (const tableName in schemaObject) {
     const columnData = schemaObject[tableName];
+    let x = 0, y = Object.keys(columnData).length;
+    if (sp && sp[tableName]) {
+      x = sp[tableName].x;
+      y = sp[tableName].y;
+    }
 
     nodes.push({
       id: tableName,
       type: 'table',
-      position: { x, y },
+      position: { x, y},
       data: { table: [tableName, columnData], edges },
     });
+  }
 
-    y += 370;
-    if (y > 1700) {
-      y = 0;
-      x += 600;
+  if (!sp) {
+    // rearrange nodes
+    nodes.forEach((node) => {
+      const nodeHeight = 90 + 25 * node.position.y;
+      dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
+    });
+
+    edges.forEach((edge) => {
+      dagreGraph.setEdge(edge.source, edge.target);
+    });
+
+    dagre.layout(dagreGraph);
+
+    let storedPositions:any = {};
+
+    nodes.forEach((node) => {
+      const nodeWithPosition = dagreGraph.node(node.id);
+      // node.targetPosition = isHorizontal ? 'left' : 'top';
+      // node.sourcePosition = isHorizontal ? 'right' : 'bottom';
+
+      // We are shifting the dagre node position (anchor=center center) to the top left
+      node.position = {
+        x: nodeWithPosition.x - nodeWithPosition.width / 2,
+        y: nodeWithPosition.y - nodeWithPosition.height / 2,
+      };
+
+      storedPositions[node.id] = {x: node.position.x, y: node.position.y};
+
+      return node;
+    });
+
+    if (dbId) {
+      localStorage.setItem(dbId, JSON.stringify(storedPositions));
     }
   }
 

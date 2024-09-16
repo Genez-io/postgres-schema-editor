@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import useSchemaStore from '../../store/schemaStore.js';
 import useSettingsStore from '../../store/settingsStore.js';
 import {
-  FaRegEdit,
+  // FaRegEdit,
   FaRegTrashAlt,
   FaRegSave,
   FaRegCheckSquare,

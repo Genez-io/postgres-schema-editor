@@ -6,6 +6,25 @@ import { devtools, subscribeWithSelector } from 'zustand/middleware';
 import { addEdge, applyNodeChanges, applyEdgeChanges } from 'reactflow';
 import { FlowState } from '../Types.js';
 
+
+const saveNodePosition = (changes: any) => {
+  const dbId = localStorage.getItem('dbId') || '';
+  const spStr = localStorage.getItem(dbId);
+  let sp:any;
+  if (spStr) {
+    sp = JSON.parse(spStr);
+  } else return;
+
+  changes.forEach((change: any) => {
+    if (change.type === 'position')
+      if(change.position) {
+        sp[change.id] = { x: change.position.x, y: change.position.y };
+      }
+  });
+
+  localStorage.setItem(dbId, JSON.stringify(sp));
+}
+
 const useFlowStore = create<FlowState>()(
   subscribeWithSelector(
     devtools((set, get) => ({
@@ -16,7 +35,8 @@ const useFlowStore = create<FlowState>()(
       setNodes: (nds) =>
         set((state:any) => ({ ...state, nodes: nds }), false, 'setNodes in /flowStore'),
 
-      onNodesChange: (changes) =>
+      onNodesChange: (changes) => {
+        saveNodePosition(changes);
         set(
           (state) => ({
             ...state,
@@ -24,7 +44,8 @@ const useFlowStore = create<FlowState>()(
           }),
           false,
           'onNodesChange in /flowStore'
-        ),
+        );
+      },
 
       onEdgesChange: (changes) =>
         set(

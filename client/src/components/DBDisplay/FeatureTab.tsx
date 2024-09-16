@@ -20,7 +20,7 @@ export default function FeatureTab(props: any) {
     (state:any) => state
   );
 
-  const { setWelcome, setDarkMode, darkMode } = useSettingsStore(
+  const { setWelcome } = useSettingsStore(
     (state:any) => state
   );
   const [action] = useState(new Array());
@@ -45,13 +45,6 @@ export default function FeatureTab(props: any) {
 
   const closeLoadDbModal = () => {
     setLoadDbModalOpened(false);
-  };
-
-  //Toggle function for DarkMode
-  const toggleClass = (): void => {
-    const page = document.getElementById('body');
-    page!.classList.toggle('dark');
-    setDarkMode();
   };
 
   // END: HELPER FUNCTIONS
