@@ -117,7 +117,7 @@ const postgresController = {
         // DATA Create property on tableData object with every loop
         const tableName = table.tablename;
         const tableDataQuery: { [key: string]: [] | {}[] } =
-          await PostgresDataSource.query(`SELECT * FROM "${tableName}"`);
+          await PostgresDataSource.query(`SELECT * FROM "${tableName}" LIMIT 20`);
         tableData[tableName] = tableDataQuery;
 
         // SCHEMAS Create property on schema object with every loop
