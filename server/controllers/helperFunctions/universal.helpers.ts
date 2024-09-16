@@ -92,7 +92,7 @@ export const addNewDbRow: RequestHandler = async (
 
     const values = Object.values(newRow);
     const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
-    const query = `INSERT INTO ${tableName} (${keys}) VALUES (${placeholders})`;
+    const query = `INSERT INTO "${tableName}" (${keys}) VALUES (${placeholders})`;
 
     const dbAddedRow = await dbDataSource.query(query, values);
 
@@ -125,7 +125,7 @@ export const updateRow: RequestHandler = async (
     // Add values for the parameterized query
     const values = [...updateValues];
 
-    let query = `UPDATE ${tableName} SET ${setClause}`;
+    let query = `UPDATE "${tableName}" SET ${setClause}`;
 
     if (primaryKey) {
       const primaryKeyName = Object.keys(primaryKey)[0];
@@ -167,7 +167,7 @@ export const deleteRow: RequestHandler = async (
       .map((key, index) => `"${key}" = $${index + 1}`)
       .join(' AND ');
 
-    const query = `DELETE FROM ${tableName} WHERE ${conditions}`;
+    const query = `DELETE FROM "${tableName}" WHERE ${conditions}`;
 
     // Use parameterized query with pg
     await dbDataSource.query(query, values);
@@ -207,7 +207,7 @@ export const addNewDbColumn: RequestHandler = async (
     newColumnString = keyValueString.slice(0, -2);
 
     const addedNewColumn: Promise<unknown> = await dbDataSource.query(`
-      ALTER TABLE ${tableName}
+      ALTER TABLE "${tableName}"
       ${newColumnString}
       `);
 
@@ -231,7 +231,7 @@ export const updateDbColumn: RequestHandler = async (
 
   try {
     const query = `
-      UPDATE ${tableName}
+      UPDATE "${tableName}"
       ALTER COLUMN
       "${columnName}" postgres ${
       columnData.additional_constraint ? columnData.additional_constraint : ''
@@ -259,14 +259,14 @@ export const deleteColumn: RequestHandler = async (
   try {
     if (constraintName) {
       let query = `
-        ALTER TABLE ${tableName} 
+        ALTER TABLE "${tableName}" 
         DROP CONSTRAINT ${constraintName};
         `;
       await dbDataSource.query(query);
     }
 
     const deletedColumn: Promise<unknown> = await dbDataSource.query(`
-      ALTER TABLE ${tableName}
+      ALTER TABLE "${tableName}"
       DROP COLUMN ${columnName};
       `);
 
@@ -292,7 +292,7 @@ export const addNewTable: RequestHandler = async (
   try {
     let keyValueString: string = '';
     newColumns.forEach((el: NewColumn) => {
-      keyValueString += `${el.name} ${el.type}${el.isPrimary ? ' PRIMARY KEY' : ''}${
+      keyValueString += `"${el.name}" ${el.type}${el.isPrimary ? ' PRIMARY KEY' : ''}${
         el.isNullable ? '' : ' NOT NULL'
       }, `;
     });
@@ -300,7 +300,7 @@ export const addNewTable: RequestHandler = async (
     const newTableColumnString: string = keyValueString.slice(0, -2);
 
     await dbDataSource.query(`
-      CREATE TABLE ${tableName} (
+      CREATE TABLE "${tableName}" (
       ${newTableColumnString}
       )`);
 
@@ -384,10 +384,10 @@ export const addForeignKey: RequestHandler = async (
 
   try {
     const addedForeignKey: Promise<unknown> = await dbDataSource.query(`
-      ALTER TABLE ${ForeignKeyTableName}
+      ALTER TABLE "${ForeignKeyTableName}"
       ADD CONSTRAINT ${constraintName}
       FOREIGN KEY ("${`${ForeignKeyColumnName}`}")
-      REFERENCES ${PrimaryKeyTableName} ("${`${PrimaryKeyColumnName}`}")
+      REFERENCES "${PrimaryKeyTableName}" ("${`${PrimaryKeyColumnName}`}")
       `);
 
     console.log('addedForeignKey in helper: ', addedForeignKey);

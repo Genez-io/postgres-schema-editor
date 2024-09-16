@@ -60,17 +60,17 @@ const postgresController = {
           foreignKeyReferenced.push({
             IsDestination: true,
             PrimaryKeyName: foreignKey.primary_key_column,
-            PrimaryKeyTableName: foreignKey.primary_key_table,
+            PrimaryKeyTableName: foreignKey.primary_key_table.replace('public.', ''),
             ReferencesPropertyName: foreignKey.foreign_key_column,
-            ReferencesTableName: 'public.' + tableName,
+            ReferencesTableName: tableName,
             constraintName: foreignKey.constraint_name,
           });
           references.push({
             IsDestination: false,
             PrimaryKeyName: foreignKey.primary_key_column,
-            PrimaryKeyTableName: foreignKey.primary_key_table,
+            PrimaryKeyTableName: foreignKey.primary_key_table.replace('public.', ''),
             ReferencesPropertyName: foreignKey.foreign_key_column,
-            ReferencesTableName: 'public.' + tableName,
+            ReferencesTableName: tableName,
             constraintName: foreignKey.constraint_name,
           });
         }
@@ -87,7 +87,7 @@ const postgresController = {
           IsPrimaryKey: keyString!.includes('PRIMARY KEY'),
           Name: columnName,
           References: references,
-          TableName: 'public.' + tableName,
+          TableName: tableName,
           Value: null,
           additional_constraints:
             additionalConstraints + hasIdentity === 'null'
@@ -117,14 +117,14 @@ const postgresController = {
         // DATA Create property on tableData object with every loop
         const tableName = table.tablename;
         const tableDataQuery: { [key: string]: [] | {}[] } =
-          await PostgresDataSource.query(`SELECT * FROM ${'public.' + tableName}`);
-        tableData['public.' + tableName] = tableDataQuery;
+          await PostgresDataSource.query(`SELECT * FROM "${tableName}"`);
+        tableData[tableName] = tableDataQuery;
 
         // SCHEMAS Create property on schema object with every loop
         const postgresSchemaData: TableColumn[] = await PostgresDataSource.query(
           postgresSchemaQuery.replace('tableName', tableName)
         );
-        schema['public.' + tableName] = await postgresFormatTableSchema(
+        schema[tableName] = await postgresFormatTableSchema(
           postgresSchemaData,
           tableName
         );
