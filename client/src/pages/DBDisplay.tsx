@@ -78,35 +78,7 @@ const DBDisplay: React.FC = () => {
         </div>
         {/* <!-- Add all page content inside this div if you want the side nav to push page content to the right (not used if you only want the sidenav to sit on top of the page --> */}
         <div ref={mainId} id="main" className="mx-auto transition-colors duration-500">
-          {welcome ? (
-            <div className="canvas-ConnectToDatabase relative right-[142px] m-auto flex w-[50%] flex-col transition-colors duration-500 dark:text-[#f8f4eb]">
-            </div>
-          ) : // If welcome state is false, check isSchema condition
-          isSchema ? (
-            // If isSchema state is true, render Show Data button and Flow component
-            <>
-              <Flow/>
-              <button
-                id="showSchema"
-                className="btn"
-                onClick={setTableMode}
-              >
-                Show data
-              </button>
-            </>
-          ) : (
-            // If isSchema state is false, render Show Schema button and DataFlow component
-            <>
-              <DataFlow />
-              <button
-                id="showSchema"
-                className="btn"
-                onClick={setTableMode}
-              >
-                Show Schema
-              </button>
-            </>
-          )}
+          <Flow/>
           <FeatureTab
             openAddTableModal={openAddTableModal}
             openDeleteTableModal={openDeleteTableModal}
