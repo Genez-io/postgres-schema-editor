@@ -43,10 +43,10 @@ export default function TableNodeColumn({
   // THIS IS WHERE YOU CAN FINISH UP THE FUNCTION TO UPDATE COLUMNS
   const onSave = async () => {
     const currentSchema = { ...schemaStore };
-    // const tableRef = columnData.TableName;
-    // const colRef = columnData.field_name;
-    // columnData.additional_constraints = selectedConstraint as "NULL" | "NOT NULL" | "PRIMARY" | "UNIQUE";
-    // const tableName = tableRef.substring(tableRef.indexOf('.') + 1);
+    const tableName = columnData.TableName;
+    const colRef = columnData.field_name;
+    columnData.additional_constraints = selectedConstraint as "NULL" | "NOT NULL" | "PRIMARY" | "UNIQUE";
+    //const tableName = tableRef.substring(tableRef.indexOf('.') + 1);
     currentSchema[columnData.TableName][columnData.field_name] = {
       ...columnData,
       // References was updated by AddReference modal, this avoids that change being overwritten
@@ -56,6 +56,18 @@ export default function TableNodeColumn({
     if (column.field_name !== columnData.field_name) {
       delete currentSchema[column.TableName][column.field_name];
     }
+    const dbId = window.location.href.replace(/.*edit\//, '');
+    await fetch(import.meta.env.VITE_API_URL + `/api/sql/postgres/updateColumn`, {
+      method:'PATCH',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':'Bearer ' + localStorage.getItem('token'),
+        'Accept-Version': 'genezio-webapp/0.3.0',
+        'Db-Id': dbId as string
+    },
+      body:JSON.stringify({tableName: tableName,  columnName: colRef, schemaData: { ...schemaStore }[tableName][colRef], columnData: columnData})
+    })
+
     setSchemaStore(currentSchema);
     setMode('default');
   };
@@ -255,14 +267,15 @@ export default function TableNodeColumn({
               <FaRegCheckSquare size={17} />
             </button>
           ) : (
-            <button
-              id={`${id}-editBtn`}
-              onClick={() => setMode('edit')}
-              className="transition-colors duration-500 hover:text-[#618fa7] dark:text-[#fbf3de] dark:hover:text-[#618fa7]"
-              data-testid="edit-column"
-            >
-              <FaRegEdit size={17} />
-            </button>
+            <></>
+            // <button
+            //   id={`${id}-editBtn`}
+            //   onClick={() => setMode('edit')}
+            //   className="transition-colors duration-500 hover:text-[#618fa7] dark:text-[#fbf3de] dark:hover:text-[#618fa7]"
+            //   data-testid="edit-column"
+            // >
+            //   <FaRegEdit size={17} />
+            // </button>
           )}
         </td>
         <td className="transition-colors duration-500 hover:text-[#618fa7] dark:text-[#fbf3de] dark:hover:text-[#618fa7]">

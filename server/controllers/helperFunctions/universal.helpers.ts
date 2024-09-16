@@ -229,13 +229,14 @@ export const updateDbColumn: RequestHandler = async (
   const dbDataSource = await dbConnect(req);
   const { columnName, columnData, tableName } = req.body;
 
+  if (!columnData.additional_constraints)
+    return;
+
   try {
     const query = `
-      UPDATE "${tableName}"
-      ALTER COLUMN
-      "${columnName}" postgres ${
-      columnData.additional_constraint ? columnData.additional_constraint : ''
-    };`;
+      ALTER TABLE "${tableName}"
+      ALTER COLUMN "${columnName}" SET
+      ${columnData.additional_constraints};`;
     await dbDataSource.query(query);
     console.log('updatedColumn in helper');
 

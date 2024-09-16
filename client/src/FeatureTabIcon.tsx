@@ -140,7 +140,7 @@ export const AddTableIcon = () => {
       viewBox="0 0 24 24"
       strokeWidth="1.5"
       stroke="currentColor"
-      className="h-6 w-6 flex-shrink-0 text-gray-500 transition duration-75 group-hover:text-yellow-500   dark:text-[#f8f4eb] dark:group-hover:text-yellow-300"
+      className="h-4 w-4 flex-shrink-0 text-gray-500 transition duration-75 group-hover:text-yellow-500   dark:text-[#f8f4eb] dark:group-hover:text-yellow-300"
     >
       <path
         strokeLinecap="round"
@@ -159,7 +159,7 @@ export const DeleteTableIcon = () => {
       viewBox="0 0 24 24"
       strokeWidth="1.5"
       stroke="currentColor"
-      className="h-6 w-6 flex-shrink-0 text-gray-500 transition duration-75 group-hover:text-yellow-500 dark:text-[#f8f4eb] dark:group-hover:text-yellow-300"
+      className="h-4 w-4 flex-shrink-0 text-gray-500 transition duration-75 group-hover:text-yellow-500 dark:text-[#f8f4eb] dark:group-hover:text-yellow-300"
     >
       <path
         strokeLinecap="round"

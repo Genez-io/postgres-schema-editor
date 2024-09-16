@@ -80,7 +80,6 @@ const DBDisplay: React.FC = () => {
         <div ref={mainId} id="main" className="mx-auto transition-colors duration-500">
           {welcome ? (
             <div className="canvas-ConnectToDatabase relative right-[142px] m-auto flex w-[50%] flex-col transition-colors duration-500 dark:text-[#f8f4eb]">
-              <h3 className="text-center">Postgres Editor</h3>
             </div>
           ) : // If welcome state is false, check isSchema condition
           isSchema ? (
@@ -89,7 +88,7 @@ const DBDisplay: React.FC = () => {
               <Flow/>
               <button
                 id="showSchema"
-                className=" rounded bg-black px-4 py-2 font-bold text-white hover:bg-yellow-500"
+                className="btn"
                 onClick={setTableMode}
               >
                 Show data
@@ -101,19 +100,20 @@ const DBDisplay: React.FC = () => {
               <DataFlow />
               <button
                 id="showSchema"
-                className="rounded bg-black px-4 py-2 font-bold text-white hover:bg-yellow-500"
+                className="btn"
                 onClick={setTableMode}
               >
                 Show Schema
               </button>
             </>
           )}
+          <FeatureTab
+            openAddTableModal={openAddTableModal}
+            openDeleteTableModal={openDeleteTableModal}
+            dbId={dbId}
+          />
         </div>
-        <FeatureTab
-          openAddTableModal={openAddTableModal}
-          openDeleteTableModal={openDeleteTableModal}
-          dbId={dbId}
-        />
+
         {inputModalState.isOpen ? (
           <InputModal
             mode={inputModalState.mode as 'table' | 'column'}
