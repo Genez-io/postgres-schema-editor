@@ -2,6 +2,18 @@
   <head>
     <meta charset="UTF-8" />
     <title>Genezio - Postgres Database Editor</title>
+    <script>
+      window.addEventListener('message', (event) => {
+        const data = event.data;
+        if (data && data.token) {
+          localStorage.setItem('token', data.token);
+        }
+      });
+
+      if (window.opener) {
+        window.opener.postMessage('ready', '*');
+      }
+    </script>
     <link
       href="https://fonts.googleapis.com/css2?family=Cabin&family=Joan&family=Kdam+Thmor+Pro&family=Oswald&display=swap"
       rel="stylesheet"

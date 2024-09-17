@@ -51,7 +51,7 @@ export const dbConnect = async (req: Request) => {
     return pools[authToken][dbId];
   }
 
-  const response:any = await fetch('https://api.genez.io/databases/' + dbId, {
+  const response:any = await fetch('https://'+process.env.API_URL+'/databases/' + dbId, {
     headers: {
       'Authorization': 'Bearer ' + authToken,
       'Accept-Version': 'genezio-webapp/0.3.0'

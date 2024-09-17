@@ -8,7 +8,7 @@ import { FlowState } from '../Types.js';
 
 
 const saveNodePosition = (changes: any) => {
-  const dbId = localStorage.getItem('dbId') || '';
+  const dbId = window.location.href.replace(/.*edit\//, '')
   const spStr = localStorage.getItem(dbId);
   let sp:any;
   if (spStr) {

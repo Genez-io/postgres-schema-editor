@@ -9,7 +9,6 @@ import { useParams } from 'react-router-dom';
 import FeatureTab from '../components/DBDisplay/FeatureTab';
 import AddReference from '../components/DBDisplay/AddReference';
 import Flow from '../components/ReactFlow/Flow';
-import DataFlow from '../components/ReactFlow/DataFlow';
 import InputModal from '../components/Modals/InputModal';
 import DataInputModal from '../components/Modals/DataInputModal';
 import DeleteTableModal from '../components/Modals/DeleteTableModal';
@@ -25,7 +24,6 @@ const DBDisplay: React.FC = () => {
 
   // Zustand state setters/getters from settingsStore
   const {
-    welcome,
     editRefMode,
     inputModalState,
     setInputModalState,
@@ -33,9 +31,7 @@ const DBDisplay: React.FC = () => {
     setDataInputModalState,
     deleteTableModalState,
     setDeleteTableModalState,
-    currentTable,
-    isSchema,
-    setTableMode,
+    currentTable
   } = useSettingsStore((state:any) => state);
 
   const openAddTableModal = () => setInputModalState(true, 'table');
@@ -46,28 +42,6 @@ const DBDisplay: React.FC = () => {
 
   return (
     <>
-      <div className="flex h-2 justify-end pr-5">
-        <div className="flex justify-end">
-          {localStorage.getItem('token') ? null :
-            <a
-              className="p-4 text-base font-bold leading-normal text-black dark:text-white"
-              href="#"
-              onClick={() => {
-                let oldToken = localStorage.getItem('token');
-                if (!oldToken) {
-                  oldToken = '';
-                }
-                let token = prompt('Please enter your token', oldToken);
-                if (token) {
-                  localStorage.setItem('token', token);
-                }
-              }}
-            >
-              Login
-            </a>
-          }
-        </div>
-      </div>
       <div id="DBDisplay" className=" transition-colors duration-500">
         <div
           id="mySidenav"

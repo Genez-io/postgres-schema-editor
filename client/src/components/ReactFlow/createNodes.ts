@@ -9,7 +9,7 @@ export default function createNodes(
 ): DataNode[] {
   // renders each table on the React Flow schema canvas
   const nodes: DataNode[] = [];
-  const dbId = localStorage.getItem('dbId') || '';
+  const dbId = window.location.href.replace(/.*edit\//, '')
   const spStr = localStorage.getItem(dbId);
   let sp:any;
   if (spStr) {

@@ -16,10 +16,17 @@ export default function LoadDbModal({
   const { setWelcome } = useSettingsStore((state:any) => state);
 
   const loadSchema = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.log('Token not found, retrying in 1s');
+      setTimeout(loadSchema, 1000);
+      return;
+    }
+
     const dataFromBackend = await axios
       .get(import.meta.env.VITE_API_URL + `/api/sql/postgres/schema`, { 
         headers: {
-          'Authorization': 'Bearer ' + localStorage.getItem('token'),
+          'Authorization': 'Bearer ' + token,
           'Accept-Version': 'genezio-webapp/0.3.0',
           'Db-Id': dbId as string
         }
