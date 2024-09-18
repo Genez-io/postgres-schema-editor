@@ -56,7 +56,7 @@ const fetchTableNames = async (dbId) => {
 
 const useData = (query) => {
   const [data, setData] = useState([]);
-  const [schema, setSchema] = useState([]);
+  const [schema, loadedSchema] = useState([]);
   const [error, setError] = useState(false);
   const [runtime, setRuntime] = useState("");
   const [loading, setLoading] = useState(true);
@@ -65,7 +65,7 @@ const useData = (query) => {
     const fetchData = (query) => {
       setLoading(true);
       setData([]);
-      setSchema([]);
+      loadedSchema([]);
       setError(false);
       let t0 = performance.now(); //start time
       runQuery(query)
@@ -75,8 +75,11 @@ const useData = (query) => {
         if (data.rows) 
           setData(data.rows);
         if (data.schema) 
-          setSchema(data.schema);
+          loadedSchema(data.schema);        
         setLoading(false);
+        if (data.rows && data.rows.length == 0 && !data.schema) {
+          toast.success("Query executed successfully");
+        }
         })
       .catch((error) => {
         let t1 = performance.now(); //end time
@@ -88,7 +91,7 @@ const useData = (query) => {
     fetchData(query);
   }, [query]);
 
-  return { data, schema, runtime, error, loading };
+  return { data, schema: schema, runtime, error, loading };
 };
 
 export  {fetchTableNames, useData};

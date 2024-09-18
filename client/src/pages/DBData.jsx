@@ -14,6 +14,7 @@ const Footer = React.lazy(() => import("../components/layouts/Footer.jsx"));
 const DBData = () => {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(true);
+  const [schema, setSchema] = useState([]);
 
   return (
     <>
@@ -54,9 +55,15 @@ const DBData = () => {
           <Editor
             setQuery={setQuery}
             query={query}
+            schema={schema}
             isOpen={isOpen}
           />
-          {query ? <TableSection query={query} isOpen={isOpen} /> : null}
+          {query ? 
+            <TableSection
+              query={query}
+              setSchema={setSchema}
+              isOpen={isOpen} 
+            /> : null}
           <Footer isOpen={isOpen} />
         </Suspense>
       </div>

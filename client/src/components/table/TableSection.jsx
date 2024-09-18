@@ -4,11 +4,14 @@ import Table from "./Table.jsx";
 
 import Loader from "../../assets/imgs/loader.svg";
 
-const TableSection = React.memo(({ query, isOpen }) => {
+const TableSection = React.memo(({ query, isOpen, setSchema }) => {
   const { data, schema, loading, runtime, error } = useData(query);
 
   const columns = useMemo(() => {
     if (data.length > 0) {
+      if (schema.length > 0) {
+        setSchema(schema);
+      }
       return Object.keys(data[0]).map((key) => {
         return {
           Header: key,
@@ -16,6 +19,7 @@ const TableSection = React.memo(({ query, isOpen }) => {
         };
       });
     } else if (schema.length > 0) {
+      setSchema(schema);
       return schema.map((columnName) => ({
         Header: columnName,
         accessor: columnName,

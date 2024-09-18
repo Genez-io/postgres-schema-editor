@@ -5,9 +5,10 @@ import "ace-builds/src-min-noconflict/mode-mysql";
 import "ace-builds/src-noconflict/theme-github";
 import { Button } from "../reusable/Button.jsx";
 
-const Editor = ({ query, setQuery, isOpen }) => {
+const Editor = ({ query, setQuery, isOpen, schema }) => {
 
   const [value, setValue] = useState("");
+  const [tableName, setTableName] = useState("");
 
   const onChange = (newValue) => {
     setValue(newValue);
@@ -16,6 +17,41 @@ const Editor = ({ query, setQuery, isOpen }) => {
   const onSubmit = () => {
     setQuery(value);
   };
+
+  const onInsertStatement = () => {
+    // Generate the column names part
+    const columns= schema.map((element) => `"${element}"`).join(", ");
+    // Generate the question marks part based on the number of columns
+    const placeholders = schema.map(() => "?").join(", ");
+    
+    let query = `INSERT INTO "${tableName}" (${columns}) VALUES (${placeholders})`;
+  
+    setValue(query);
+  };
+
+  const onUpdateStatement = () => {
+    // Generate the column names part
+    const values= schema.map((element) => `"${element}"=?`).join(", ");
+
+    let query = `UPDATE "${tableName}" SET ${values} WHERE ?`;
+  
+    setValue(query);
+  };
+
+  const onDeleteStatement = () => {
+    let query = `DELETE FROM "${tableName}" WHERE ?`;
+  
+    setValue(query);
+  };
+
+  useEffect(() => {
+    const matches = value.match(/^\s*select\s+\*\s+from\s+\"?([^"\s]*)\"?\s*$/i);
+    if (matches) {
+      setTableName(matches[1]);
+    } else {
+      setTableName("");
+    }
+  }, [value]);
 
   useEffect(() => {
     setValue(query);
@@ -69,6 +105,22 @@ const Editor = ({ query, setQuery, isOpen }) => {
           </svg>{" "}
           Run Query
         </Button>
+        {tableName != "" && (
+          <>
+            &nbsp;
+            <Button handleClick={onInsertStatement}>
+              Insert
+            </Button>
+            &nbsp;
+            <Button handleClick={onUpdateStatement}>
+              Update
+            </Button>
+            &nbsp;
+            <Button handleClick={onDeleteStatement}>
+              Delete
+            </Button>
+          </>
+        )}
       </div>
     </main>
   );
