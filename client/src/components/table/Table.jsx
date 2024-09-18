@@ -151,7 +151,7 @@ const Table = ({ columns, data, query }) => {
         </div>
         <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
           <div className="flex gap-x-2">
-            <span className="text-sm text-gray-700">
+            <span className="text-sm text-gray-500">
               Page <span className="font-medium">{state.pageIndex + 1}</span> of{" "}
               <span className="font-medium">{pageOptions.length}</span>
             </span>
