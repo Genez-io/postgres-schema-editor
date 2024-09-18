@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import AceEditor from "react-ace";
 import "ace-builds/src-min-noconflict/ext-language_tools";
 import "ace-builds/src-min-noconflict/mode-mysql";
@@ -9,6 +9,7 @@ const Editor = ({ query, setQuery, isOpen, schema }) => {
 
   const [value, setValue] = useState("");
   const [tableName, setTableName] = useState("");
+  const editorRef = useRef(null);
 
   const onChange = (newValue) => {
     setValue(newValue);
@@ -57,6 +58,46 @@ const Editor = ({ query, setQuery, isOpen, schema }) => {
     setValue(query);
   }, [query]);
 
+  // Custom completer for table and column names
+  useEffect(() => {
+    if (editorRef.current) {
+      const langTools = ace.require('ace/ext/language_tools');
+
+      const customCompleter = {
+        getCompletions: function(editor, session, pos, prefix, callback) {
+          const completions = [];
+
+          if (tableName) {
+            completions.push({
+              caption: tableName,
+              value: `"${tableName}"`,
+              meta: "table"
+            });
+          }
+
+          if (schema && schema.length > 0) {
+            schema.forEach((column) => {
+              completions.push({
+                caption: column,
+                value: `"${column}"`,
+                meta: "column"
+              });
+            });
+          }
+
+          callback(null, completions);
+        }
+      };
+
+      // Replace existing completers to prevent duplicates
+      editorRef.current.completers = [customCompleter];
+    }
+  }, [schema, tableName]);
+
+  const onLoad = (editorInstance) => {
+    editorRef.current = editorInstance;
+  };
+
   return (
     <main
       className={`${
@@ -86,6 +127,7 @@ const Editor = ({ query, setQuery, isOpen, schema }) => {
           value={value}
           onChange={onChange}
           showLineNumbers
+          onLoad={onLoad}
         />
       </label>
       <div>
