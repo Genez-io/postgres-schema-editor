@@ -14,11 +14,25 @@ import {
   deleteTable,
   addForeignKey,
   removeForeignKey,
+  query,
+  tableSchema
 } from './helperFunctions/universal.helpers.js';
 import { resourceLimits } from 'worker_threads';
 
 // Object containing all of the middleware
 const postgresController = {
+
+  postgresExecuteQuery: async (req: Request, res: Response, next: any) => {
+    const result = await Promise.resolve(query(req, res, next));
+    res.locals.rows = result;
+    const matches = req.body.query.match(/^\s*select\s+\*\s+from\s+\"?([^"\s]*)\"?\s*$/i);
+    if (matches) {
+      const tName = matches[1];
+      const ts = await Promise.resolve(tableSchema(req, tName));
+      res.locals.schema = ts;
+    }
+  },
+
   //----------Function to collect all schema and data from database-----------------------------------------------------------------
   postgresQuery: async (req: Request, res: Response, next: NextFunction) => {
     const PostgresDataSource = await dbConnect(req);

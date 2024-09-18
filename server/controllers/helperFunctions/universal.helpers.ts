@@ -51,14 +51,17 @@ export const dbConnect = async (req: Request) => {
     return pools[authToken][dbId];
   }
 
-  const response:any = await fetch('https://'+process.env.API_URL+'/databases/' + dbId, {
-    headers: {
-      'Authorization': 'Bearer ' + authToken,
-      'Accept-Version': 'genezio-webapp/0.3.0'
-  }});
+  const requestUrl = 'https://'+process.env.API_URL+'/databases/' + dbId;
+  const requestHeaders = {
+    'Authorization': 'Bearer ' + authToken,
+    'Accept-Version': 'genezio-webapp/0.3.0'
+  };
+
+  const response:any = await fetch(requestUrl, {headers: requestHeaders});
 
   if (!response.ok) {
     // Handle HTTP errors
+    console.error(requestUrl, requestHeaders);
     throw new Error(`HTTP error! Status: ${response.status}`);
   }
  
@@ -73,6 +76,32 @@ export const dbConnect = async (req: Request) => {
 
 };
 
+export const query: RequestHandler = async (
+  req: Request,
+  _res: Response,
+  next
+) => {
+  const dbDataSource = await dbConnect(req);
+  const { query } = req.body;
+
+  const result = await dbDataSource.query(query);
+  return result;
+}
+
+export const tableSchema = async (req: Request, tName: string) => {
+  const dbDataSource = await dbConnect(req);
+  
+  // Run the query to fetch column names
+  const result = await dbDataSource.query(
+    "SELECT column_name FROM information_schema.columns WHERE table_name = $1", 
+    [tName]
+  );
+  
+  // Extract and return only the column names as an array
+  const columnNames = result.map((row: { column_name: string }) => row.column_name);
+  
+  return columnNames;
+};
 //-------------------------------------DATA TABLE ROWS----------------------------------------------------------------------------------------
 //-------------------ADD NEW ROW-----------------------------------------------------------------------------------------
 
@@ -333,7 +362,7 @@ export const getTableNames: RequestHandler = async (
     const tableNameList: TableNames[] = await dbDataSource.query(query);
 
     const tables: (string | undefined)[] = tableNameList.map((obj: TableNames) => {
-      return obj.name; // Postgres
+      return obj.tablename; // Postgres
     });
 
     return tables;

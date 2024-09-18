@@ -12,6 +12,27 @@ postgresRouter.get(
   }
 );
 
+postgresRouter.post(
+  '/query',
+  async (req: Request, res: Response, next) => {
+    try {
+      await postgresController.postgresExecuteQuery(req, res, next);
+      let resp:any = {};
+      if (res.locals.rows.length != undefined) {
+        resp.rows = res.locals.rows;
+      } else {
+        resp = res.locals.rows;
+      }
+      if (res.locals.schema) resp.schema = res.locals.schema;
+      return res.status(200).json(resp);
+    } catch (error: any) {
+      console.log('Error in /query route: ', error.message);
+      return res.status(500).json({"error": error.message});
+    }
+  }
+);
+
+
 //-------------------------------------DATA TABLE ROWS----------------------------------------------------------------------------------------
 //-------------------ADD NEW ROW-----------------------------------------------------------------------------------------
 postgresRouter.post(
