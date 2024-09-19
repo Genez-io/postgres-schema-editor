@@ -5,7 +5,8 @@ import { useState, useRef } from 'react';
 import useSchemaStore from '../../store/schemaStore.js';
 import useFlowStore from '../../store/flowStore.js';
 import useSettingsStore from '../../store/settingsStore.js';
-//import icon
+import logo from '../../assets/logo-single-dark.svg';
+
 import {
   AddTableIcon,
   DeleteTableIcon,
@@ -51,6 +52,7 @@ export default function FeatureTab(props: any) {
 
   return (
     <>
+      <img src={logo} alt="Genezio" className="genezio-logo" />
       {!loadDbModalOpened ? (
         <button
           onClick={() => {

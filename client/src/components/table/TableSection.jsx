@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import {useData} from "../../hooks/useData";
 import Table from "./Table.jsx";
 
-import Loader from "../../assets/imgs/loader.svg";
+import Loader from "../../assets/loader.svg";
 
 const TableSection = React.memo(({ query, isOpen, setSchema }) => {
   const { data, schema, loading, runtime, error } = useData(query);
