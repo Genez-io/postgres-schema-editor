@@ -432,7 +432,7 @@ export const removeForeignKey: RequestHandler = async (
   try {
     const removedForeignKey: Promise<unknown> = await dbDataSource.query(`
       ALTER TABLE ${tableName}
-      DROP 'CONSTRAINT' ${constraintName}
+      DROP CONSTRAINT ${constraintName}
       `);
 
     console.log('addedForeignKey in helper: ', removedForeignKey);
