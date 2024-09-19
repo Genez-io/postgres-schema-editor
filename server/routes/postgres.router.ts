@@ -6,7 +6,7 @@ const postgresRouter = Router();
 // Retrieve Postgres schema and data from REMOTE db
 postgresRouter.get(
   '/schema',
-  postgresController.postgresQuery,
+  postgresController.postgresSchema,
   (_req: Request, res: Response) => {
     return res.status(200).json(res.locals);
   }
@@ -90,7 +90,7 @@ postgresRouter.delete(
 postgresRouter.post(
   '/saveNewTable',
   postgresController.postgresAddNewTable,
-  postgresController.postgresQuery,
+  postgresController.postgresSchema,
   (_req: Request, res: Response) => {
     return res.status(200).json(res.locals);
   }
@@ -107,7 +107,7 @@ postgresRouter.get(
 postgresRouter.delete(
   '/deleteTable',
   postgresController.postgresDeleteTable,
-  postgresController.postgresQuery,
+  postgresController.postgresSchema,
   (_req: Request, res: Response) => {
     return res.status(200).json(res.locals);
   }

@@ -1,6 +1,5 @@
 //-----IMPORTED FILES/MODULES
 import useSchemaStore from '../../store/schemaStore.js';
-import useCredentialsStore from '../../store/credentialsStore.js';
 
 //-----TYPES
 type EachRow = {
@@ -21,7 +20,6 @@ export default function RowInput({
   handleRowChange,
   secondaryColumnNames,
 }: RowInputProps) {
-  const { dbCredentials } = useCredentialsStore((state:any) => state);
   const { schemaStore } = useSchemaStore((state:any) => state);
 
   const arrOfDataType = schemaStore[tableName as string];
@@ -30,9 +28,6 @@ export default function RowInput({
   let columnNames: string[];
   let maxConstraintNameLength: number;
   maxConstraintNameLength = 63; //Postgres
-  if (!dbCredentials.db_type) {
-    dbCredentials.db_type = 'postgres';
-  }
 
   //adding first row of data current table = [], with length=0, and _prototype
   //when it runs through the function it ends up being [{with properties}]

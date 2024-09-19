@@ -3,7 +3,6 @@ import { SQLDataType, ColumnData } from '../../Types';
 import ColumnInput from './ColumnInput';
 import useSchemaStore from '../../store/schemaStore.js';
 import useDataStore from '../../store/dataStore.js';
-import useCredentialsStore from '../../store/credentialsStore.js';
 
 //closeInputModal
 
@@ -39,7 +38,6 @@ export default function InputModal({
   // TODO: separate state for table name and column data
   // TODO: FORCE USER TO CHOOSE ONE AND ONLY ONE COLUMN AS PK WHEN CREATING TABLE
   // AFTERWARDS, PK MAY NOT BE EDITED
-  const { dbCredentials } = useCredentialsStore((state:any) => state);
 
   const { setSchemaStore } = useSchemaStore((state:any) => state);
   const { setDataStore } = useDataStore((state:any) => state);
@@ -221,12 +219,7 @@ export default function InputModal({
                 required
                 maxLength={63}
                 onChange={(e) =>
-                  setTableName(
-                    (dbCredentials.db_type === 'postgres'
-                      ? e.target.value.toLowerCase().trim()
-                      : e.target.value
-                    ).trim()
-                  )
+                  setTableName(e.target.value.trim())
                 }
               />
             </>
@@ -238,16 +231,14 @@ export default function InputModal({
           <h1 className="  text-slate-900 dark:text-[#f8f4eb]">
             {mode === 'table' ? 'Columns' : 'New Columns'}
           </h1>
-          {dbCredentials.db_type !== 'oracle' ? (
-            <button
-              type="button"
-              className="btn"
-              onClick={addColumn}
-              data-testid="add-table-add-column"
-            >
-              Add Column
-            </button>
-          ) : null}
+          <button
+            type="button"
+            className="btn"
+            onClick={addColumn}
+            data-testid="add-table-add-column"
+          >
+            Add Column
+          </button>
         </div>
         {columnInputs}
         <div className="mx-auto flex w-[50%] max-w-[200px] justify-between">

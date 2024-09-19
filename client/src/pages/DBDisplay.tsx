@@ -12,7 +12,6 @@ import Flow from '../components/ReactFlow/Flow';
 import InputModal from '../components/Modals/InputModal';
 import DataInputModal from '../components/Modals/DataInputModal';
 import DeleteTableModal from '../components/Modals/DeleteTableModal';
-import useCredentialsStore from '../store/credentialsStore.js';
 import useSettingsStore from '../store/settingsStore.js';
 
 const DBDisplay: React.FC = () => {
@@ -20,7 +19,6 @@ const DBDisplay: React.FC = () => {
   if (!dbId) {
     dbId = 'not-set';
   }
-  useCredentialsStore();
 
   // Zustand state setters/getters from settingsStore
   const {

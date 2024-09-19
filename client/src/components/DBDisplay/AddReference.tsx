@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import useSchemaStore from '../../store/schemaStore.js';
 import useSettingsStore from '../../store/settingsStore.js';
-import useCredentialsStore from '../../store/credentialsStore.js';
 import { InnerReference } from '../../Types.js';
 
 const AddReference: React.FC<{dbId: string}> = ({ dbId }) => {
   const { currentTable, currentColumn, setEditRefMode } = useSettingsStore((state:any) => state);
   const { schemaStore, addForeignKeySchema, setSchemaStore } = useSchemaStore((state:any) => state);
-  const { dbCredentials } = useCredentialsStore((state:any) => state);
 
   // Constraint Names have a character limit depending on the database
   let maxConstraintNameLength: number;
@@ -54,13 +52,6 @@ const AddReference: React.FC<{dbId: string}> = ({ dbId }) => {
         ForeignKeyColumnName: formValues.ReferencesPropertyName,
         constraintName: formValues.constraintName.replace(/[^a-zA-Z0-9_]/g, "")
       };
-
-      // Front end Error checking for Oracle SQL
-      if (dbCredentials.db_type === 'oracle' && schemaStore[formValues.PrimaryKeyTableName][formValues.PrimaryKeyName].References[0].IsDestination === true) {
-        window.alert(`Oracle SQL only allows for a Primary Key to be a part of a single Foreign Key. Column ${formValues.PrimaryKeyName} of table ${formValues.PrimaryKeyTableName} already has a Foreign Key associated with it`);
-        console.error(`Oracle SQL only allows for a Primary Key to be a part of a single Foreign Key. Column ${formValues.PrimaryKeyName} of table ${formValues.PrimaryKeyTableName} already has a Foreign Key associated with it`);
-        return;
-      }
 
       await fetch(import.meta.env.VITE_API_URL + `/api/sql/postgres/addForeignKey`, {
         method: 'PUT',

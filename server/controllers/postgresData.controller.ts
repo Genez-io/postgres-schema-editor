@@ -34,7 +34,7 @@ const postgresController = {
   },
 
   //----------Function to collect all schema and data from database-----------------------------------------------------------------
-  postgresQuery: async (req: Request, res: Response, next: NextFunction) => {
+  postgresSchema: async (req: Request, res: Response, next: NextFunction) => {
     const PostgresDataSource = await dbConnect(req);
     console.log('MADE IT TO postgresQuery MIDDLEWARE');
     /*
@@ -123,16 +123,12 @@ const postgresController = {
       );
       //Declare storage objects with their related interfaces
 
-      const tableData: TableColumns = {};
       const schema: TableSchema = {};
 
       // LOOP
       for (const table of tables) {
         // DATA Create property on tableData object with every loop
         const tableName = table.tablename;
-        const tableDataQuery: { [key: string]: [] | {}[] } =
-          await PostgresDataSource.query(`SELECT * FROM "${tableName}" LIMIT 20`);
-        tableData[tableName] = tableDataQuery;
 
         // SCHEMAS Create property on schema object with every loop
         const postgresSchemaData: TableColumn[] = await PostgresDataSource.query(
@@ -159,7 +155,6 @@ const postgresController = {
 
       // Storage of queried results into res.locals
       res.locals.schema = schema;
-      res.locals.data = tableData;
 
       // Disconnecting after data has been received
       return next();

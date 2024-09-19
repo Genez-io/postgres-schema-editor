@@ -348,20 +348,12 @@ export const getTableNames: RequestHandler = async (
   next: NextFunction
 ) => {
   const dbDataSource = await dbConnect(req);
-
-  interface TableNames {
-    tablename?: string | undefined; // Postgres
-    Tables_in_user?: string | undefined; // MySQL
-    TABLE_NAME?: string | undefined; // Microsoft & Oracle
-    name?: string | undefined; // SQLite
-  }
-
   try {
     let query: string = "SELECT tableName FROM pg_catalog.pg_tables WHERE schemaname = 'public'"; // Postgres
 
-    const tableNameList: TableNames[] = await dbDataSource.query(query);
+    const tableNameList: any = await dbDataSource.query(query);
 
-    const tables: (string | undefined)[] = tableNameList.map((obj: TableNames) => {
+    const tables: (string | undefined)[] = tableNameList.map((obj: any) => {
       return obj.tablename; // Postgres
     });
 

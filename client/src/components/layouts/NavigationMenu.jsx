@@ -8,12 +8,15 @@ const Navbar = React.memo(({ setQuery, isOpen, setIsOpen }) => {
   useEffect(() => {
     fetchTableNames().then((data) => {
       setTableNames(data);
+      if (data.length > 0) {
+        handleQuery(data[0]);
+      }
       setLoading(false);
     });
   }, []);
 
-  const handleQuery = (queryName) => {
-    setQuery(`select * from "${queryName}"`);
+  const handleQuery = (tableName) => {
+    setQuery(`select * from "${tableName}"`);
   };
   return (
     <>
