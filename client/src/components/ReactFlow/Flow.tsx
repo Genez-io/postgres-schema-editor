@@ -5,13 +5,13 @@ import ReactFlow, {
   Controls,
   ControlButton,
   ReactFlowProps,
+  Background
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import DownloadButton from './DownloadButton';
 import TableNode from './TableNode';
 import createEdges from './createEdges';
 import createNodes from './createNodes';
-import useSettingsStore from '../../store/settingsStore.js';
 
 const nodeTypes = {
   table: TableNode,
@@ -21,7 +21,6 @@ export default function Flow(): JSX.Element {
   // set up states for nodes and edges
   const { edges, setEdges, nodes, setNodes, onNodesChange, onEdgesChange, onConnect } =
     useFlowStore((state:any) => state);
-  const { darkMode } = useSettingsStore((state:any) => state);
   const { schemaStore } = useSchemaStore((state:any) => state);
 
   // re-render every time schemaStore updates
@@ -43,10 +42,7 @@ export default function Flow(): JSX.Element {
   const handleNodeClick = (_: any, node: ReactFlowProps) => {
     // Find edges connected to the clicked node and update their selected property using map method
     const updatedEdges = edges.map((edge: any) => {
-      // below two lines are set up to be able to change the edge color if the darkMode state changes.
-      // Not currently being utalized.
-      let hlColor;
-      darkMode === true ? (hlColor = '#fedd0a') : (hlColor = '#fedd0a');
+      const hlColor = '#fedd0a';
       // The below condition checks to see if the selected node is either the source or the target of the current node in the edges array.
       if (edge.source === node.id || edge.target === node.id) {
         return {
@@ -95,6 +91,7 @@ export default function Flow(): JSX.Element {
         fitView
       >
         <div id="download-image"></div>
+        <Background className=" transition-colors duration-500 dark:bg-black" />
         <Controls position="top-right">
           <ControlButton>
             <DownloadButton />

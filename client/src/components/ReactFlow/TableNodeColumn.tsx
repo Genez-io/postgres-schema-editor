@@ -161,89 +161,38 @@ export default function TableNodeColumn({
       {/* TODO: SEE ABOUT DELETING KEY ATTRIBUTE AND ID ATTRIBUTES */}
       <tr key={column.field_name} id={column.field_name} className="dark:text-[#f8f4eb] ">
         <td className="dark:text-[#f8f4eb]" id={`${id}-field_name`}>
-          {mode === 'edit' ? (
-            <input
-              className="bg-[#f8f4eb] hover:shadow-md focus:outline-1 dark:text-black"
-              value={columnData.field_name}
-              // Currently unable to update column info if the name is changed.
-              disabled
-              // Need an additional query before to change the name before updating column
-              onChange={(e) =>
-                setColumnData((prevData) => ({
-                  ...prevData,
-                  Name: e.target.value,
-                  field_name: e.target.value.replace(/\s/g, '_'),
-                }))
-              }
-            />
-          ) : (
-            columnData.field_name
-          )}
+          {columnData.field_name}
         </td>
         <td className="dark:text-[#f8f4eb]" id={`${id}-data_type`}>
-          {mode === 'edit' ? (
-            <select
-              className="bg-[#f8f4eb] dark:text-black"
-              value={columnData.data_type}
-              onChange={(e) =>
-                setColumnData((prevData) => ({
-                  ...prevData,
-                  data_type: e.target.value as SQLDataType,
-                }))
-              }
-            >
-              <DataTypeOptions />
-            </select>
-          ) : (
-            columnData.data_type
-          )}
+          {columnData.data_type}
         </td>
         <td className="dark:text-[#f8f4eb]" id={`${id}-additional_constraints`}>
-          {mode === 'edit' ? (
-            <select
-              className="bg-[#f8f4eb] dark:text-black"
-              value={selectedConstraint}
-              onChange={handleConstraintChange}
-            >
-              {/* TODO: CHANGE TO NULLABLE BOOLEAN */}
-              <option value={undefined}>N/A</option>
-              <option value="NOT NULL">NOT NULL</option>
-              <option value="PRIMARY">PRIMARY</option>
-              <option value="UNIQUE">UNIQUE</option>
-            </select>
-          ) : (
-            columnData.additional_constraints
-          )}
+          {columnData.additional_constraints}
         </td>
         <td className="dark:text-[#f8f4eb]" id={`${id}-IsPrimaryKey`}>
           {`${columnData.IsPrimaryKey}`}
         </td>
         <td className="dark:text-[#f8f4eb]" id={`${id}-IsForeignKey`}>
-          {mode === 'edit' ? (
-            <input
-              type="checkbox"
-              className="bg-[#f8f4eb] dark:text-black"
-              checked={columnData.IsForeignKey}
-              onChange={() => {
-                // don't allow if only one table
-                if (Object.keys(schemaStore).length <= 1) {
-                  return window.alert(
-                    'Must have more than one table to create foreign key constraints'
-                  );
-                }
-                setColumnData((prevData) => {
-                  return {
-                    ...prevData,
-                    IsForeignKey: !prevData.IsForeignKey,
-                  };
-                });
-                // if box is now checked (state hasn't updated yet), open fk modal
-                if (!columnData.IsForeignKey) openAddReferenceModal();
-              }}
-            />
-          ) : (
-            `${columnData.IsForeignKey}`
-          )}
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              if (Object.keys(schemaStore).length <= 1) {
+                return window.alert(
+                  'Must have more than one table to create foreign key constraints'
+                );
+              }
+
+              // setColumnData((prevData) => {
+              //   return {
+              //     ...prevData,
+              //     IsForeignKey: !prevData.IsForeignKey,
+              //   };
+              // });
+              // if box is now checked (state hasn't updated yet), open fk modal
+              if (!columnData.IsForeignKey) openAddReferenceModal();
+          }}
+          >{`${columnData.IsForeignKey}`}</a>
         </td>
         <td className="dark:text-[#f8f4eb]">
           {mode === 'edit' ? (
@@ -266,30 +215,10 @@ export default function TableNodeColumn({
             >
               <FaRegCheckSquare size={17} />
             </button>
-          ) : (
-            <></>
-            // <button
-            //   id={`${id}-editBtn`}
-            //   onClick={() => setMode('edit')}
-            //   className="transition-colors duration-500 hover:text-[#618fa7] dark:text-[#fbf3de] dark:hover:text-[#618fa7]"
-            //   data-testid="edit-column"
-            // >
-            //   <FaRegEdit size={17} />
-            // </button>
-          )}
+          ) : null}
         </td>
         <td className="transition-colors duration-500 hover:text-[#618fa7] dark:text-[#fbf3de] dark:hover:text-[#618fa7]">
-          {mode === 'edit' ? (
-            <button
-              id={`${id}-cancelBtn`}
-              onClick={() => {
-                setColumnData({ ...column });
-                setMode('default');
-              }}
-            >
-              <FaRegWindowClose size={17} />
-            </button>
-          ) : mode === 'delete' ? (
+          {mode === 'delete' ? (
             <button id={`${id}-cancelBtn`} onClick={() => setMode('default')}>
               <FaRegWindowClose size={17} />
             </button>
