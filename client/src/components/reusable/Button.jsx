@@ -18,6 +18,20 @@ export const Button = ({ children, className, handleClick }) => {
   );
 };
 
+export const SecondaryButton = ({ children, className, handleClick }) => {
+  return (
+    <button
+      className={classNames(
+        "bg-secondary-dark hover:bg-secondary-dark transition-colors text-white rounded-md font-semibold px-4 py-2 my-4 shadow-lg",
+        className
+      )}
+      onClick={handleClick}
+    >
+      {children}
+    </button>
+  );
+};
+
 export const PageButton = ({ children, className, ...rest }) => {
   return (
     <button

@@ -3,7 +3,7 @@ import AceEditor from "react-ace";
 import "ace-builds/src-min-noconflict/ext-language_tools";
 import "ace-builds/src-min-noconflict/mode-mysql";
 import "ace-builds/src-noconflict/theme-github";
-import { Button } from "../reusable/Button.jsx";
+import { Button, SecondaryButton } from "../reusable/Button.jsx";
 
 const Editor = ({ query, setQuery, isOpen, schema }) => {
 
@@ -17,6 +17,12 @@ const Editor = ({ query, setQuery, isOpen, schema }) => {
 
   const onSubmit = () => {
     setQuery(value);
+  };
+
+  const onSelectStatement = () => {
+    let query = `SELECT * FROM "${tableName}"`;
+
+    setValue(query);
   };
 
   const onInsertStatement = () => {
@@ -50,7 +56,7 @@ const Editor = ({ query, setQuery, isOpen, schema }) => {
     if (matches) {
       setTableName(matches[1]);
     } else {
-      setTableName("");
+      //setTableName("");
     }
   }, [value]);
 
@@ -150,17 +156,21 @@ const Editor = ({ query, setQuery, isOpen, schema }) => {
         {tableName != "" && (
           <>
             &nbsp;
-            <Button handleClick={onInsertStatement}>
+            <SecondaryButton handleClick={onSelectStatement}>
+              Select
+            </SecondaryButton>
+            &nbsp;
+            <SecondaryButton handleClick={onInsertStatement}>
               Insert
-            </Button>
+            </SecondaryButton>
             &nbsp;
-            <Button handleClick={onUpdateStatement}>
+            <SecondaryButton handleClick={onUpdateStatement}>
               Update
-            </Button>
+            </SecondaryButton>
             &nbsp;
-            <Button handleClick={onDeleteStatement}>
+            <SecondaryButton handleClick={onDeleteStatement}>
               Delete
-            </Button>
+            </SecondaryButton>
           </>
         )}
       </div>

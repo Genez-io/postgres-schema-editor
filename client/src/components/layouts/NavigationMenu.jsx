@@ -16,7 +16,7 @@ const Navbar = React.memo(({ setQuery, isOpen, setIsOpen }) => {
   }, []);
 
   const handleQuery = (tableName) => {
-    setQuery(`select * from "${tableName}"`);
+    setQuery(`SELECT * FROM "${tableName}"`);
   };
   return (
     <>
