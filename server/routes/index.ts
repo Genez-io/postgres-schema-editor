@@ -1,4 +1,4 @@
-import express, { Express, Request, Response, NextFunction } from 'express';
+import { Express, Request, Response } from 'express';
 import { postgresRouter } from './postgres.router.js';
 import log from '../logger/index.js';
 import type { DefaultErr } from '../Types.js';
@@ -13,7 +13,7 @@ const routes = (app: Express) => {
   });
 
   // Global Error Handler
-  app.use((err: ErrorEvent, _req: Request, res: Response, _next: NextFunction) => {
+  app.use((err: ErrorEvent, _req: Request, res: Response) => {
     const defaultErr: DefaultErr = {
       log: 'Express error handler caught unknown middleware error',
       status: 500,

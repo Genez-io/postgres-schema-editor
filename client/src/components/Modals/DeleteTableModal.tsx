@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import useSchemaStore from '../../store/schemaStore.js';
-import useDataStore from '../../store/dataStore.js';
 import useFlowStore from '../../store/flowStore';
 
 type DeleteTableModalProps = {
@@ -16,7 +15,6 @@ export default function DeleteTableModal({
   const [connectPressed, setConnectPressed] = useState(false);
 
   const { schemaStore, setSchemaStore } = useSchemaStore((state:any) => state);
-  const { dataStore, setDataStore } = useDataStore((state:any) => state);
   const { setEdges, setNodes } = useFlowStore((state:any) => state);
 
   useEffect(() => {
@@ -60,12 +58,10 @@ export default function DeleteTableModal({
 
       //delete the table object from the schemaStore object
       delete schemaStore[tableName];
-      delete dataStore[tableName];
       setNodes([]);
       setEdges([]);
       //pass in modified schemaStore object which triggers a the rerender function in the flow.tsx component
       setSchemaStore(Object.keys(schemaStore).length > 0 ? { ...schemaStore } : {});
-      setDataStore(Object.keys(dataStore).length > 0 ? { ...dataStore } : {});
       setTableName('');
       setConnectPressed(false);
       closeDeleteTableModal();

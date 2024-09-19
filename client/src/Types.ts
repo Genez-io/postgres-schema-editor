@@ -1,78 +1,11 @@
-export type DefaultErr = {
-  log: string;
-  status: number;
-  message: string;
-};
-
 export type Props = {
   isActive: boolean;
   setIsActive: (active: boolean) => void;
 };
 
-export interface dbCredentials {
-  database_name: string | number | null;
-  username: string | number | null;
-  password: string | number | null;
-  hostname: string | number | null;
-  port: string | number | null;
-  database_link: string | number | null;
-  db_type: string;
-}
-
 export interface Data {
   edges: RowsOfData[];
   table: [string, RowsOfData[]];
-}
-
-export interface RefObj {
-  IsDestination: boolean;
-  PrimaryKeyName: string;
-  PrimaryKeyTableName: string;
-  ReferencesPropertyName: string;
-  ReferencesTableName: string;
-  constraintName: string;
-}
-
-export interface TableColumn {
-  Field?: string;
-  Type?: string;
-  Null?: string;
-  Key?: string;
-  Default?: any;
-  Extra?: string;
-  References?: RefObj[];
-  TableName?: string;
-  IsForeignKey?: boolean;
-  IsPrimaryKey?: boolean;
-  Value?: null;
-  additional_constraints?: string | null;
-  data_type?: string;
-  field_name?: string;
-  Name?: string;
-  [key: string]: any;
-  update_rule?: string;
-  delete_rule?: string;
-  default_type?: string;
-}
-
-export interface TableColumns {
-  [columnName: string]: TableColumn;
-}
-
-export interface TableSchema {
-  [tableName: string]: TableColumns;
-}
-
-export interface ReferenceType {
-  [index: number]: {
-    IsDestination: boolean;
-    PrimaryKeyName: string;
-    PrimaryKeyTableName: string;
-    ReferencesPropertyName: string;
-    ReferencesTableName: string;
-    constraintName: string;
-  };
-  length: number;
 }
 
 export type Edge = {
@@ -111,18 +44,6 @@ export type TableTuple = [
   ColumnData: { [ColumnName: string]: ColumnSchema } | RowsOfData[] | RowsOfData
 ];
 
-export interface dataSourceConnection {
-  type: string;
-  host?: string;
-  port?: string | number;
-  username?: string;
-  password?: string;
-  database?: string;
-  serviceName?: string;
-  synchronize?: boolean;
-  logging?: boolean;
-}
-
 // ---------------------------------------------------------------------
 // ZUSTAND STORE AND FRONT-END TYPES
 
@@ -135,30 +56,6 @@ export type ColumnData = {
   // Using `string | null` instead of optional `?`
   // because default value can be added, which throws controlled type error
   defaultValue: string | null;
-};
-
-// ColumnSchema and Reference are used by schemaStore
-export type Reference = {
-  [tableName: string]: {
-    PrimaryKeyName: string;
-    PrimaryKeyTableName: string;
-    ReferencesPropertyName: string;
-    ReferencesTableName: string;
-    IsDestination: boolean;
-    constraintName: string;
-  };
-};
-
-// export type PrimaryKeyReference = {
-//   [tableName: string]: RowsOfData
-// }
-
-export type ForeignKeyData = {
-  PrimaryKeyTableName: string;
-  PrimaryKeyColumnName: string;
-  ForeignKeyTableName: string;
-  ForeignKeyColumnName: string;
-  constraintName: string;
 };
 
 export type InnerReference = {
@@ -191,14 +88,6 @@ export type DataStore = {
   [TableName: string]: RowsOfData[];
 };
 
-export type SchemaStore = {
-  [TableName: string]: {
-    [ColumnName: string]: ColumnSchema;
-  };
-};
-
-export type DataRowArray = Array<string | number | boolean>;
-
 export type FlowState = {
   edges: any[];
   setEdges: (eds: any) => void;
@@ -209,11 +98,6 @@ export type FlowState = {
   onConnect: (connection: any) => void;
 };
 
-export type ColumnDataForDataTable = {
-  [key: string | number]: RowsOfData[];
-};
-//######################
-
 export interface Table {
   [key: string]: ColumnSchema;
 }
@@ -223,7 +107,6 @@ export interface SchemaObject {
 }
 
 export type SQLDataType =
-  | 'AUTO_INCREMENT'
   | 'SERIAL'
   | 'SMALLSERIAL'
   | 'BIGSERIAL'
@@ -292,130 +175,3 @@ export type SQLDataType =
   | 'GEOGRAPHY'
   | 'CUBE'
   | 'LTREE';
-
-export type PostgresDataTypes =
-  | 'bigint'
-  | 'bigserial'
-  | 'bit'
-  | 'bit varying'
-  | 'boolean'
-  | 'bool'
-  | 'box'
-  | 'bytea'
-  | 'char'
-  | 'character'
-  | 'character varying'
-  | 'cidr'
-  | 'circle'
-  | 'date'
-  | 'decimal'
-  | 'double precision'
-  | 'float4'
-  | 'float8'
-  | 'inet'
-  | 'int'
-  | 'int2'
-  | 'int4'
-  | 'int8'
-  | 'integer'
-  | 'interval'
-  | 'json'
-  | 'jsonb'
-  | 'line'
-  | 'lseg'
-  | 'macaddr'
-  | 'macaddr8'
-  | 'money'
-  | 'numeric'
-  | 'path'
-  | 'pg_lsn'
-  | 'pg_snapshot'
-  | 'point'
-  | 'polygon'
-  | 'real'
-  | 'serial'
-  | 'serial2'
-  | 'serial4'
-  | 'smallint'
-  | 'smallserial'
-  | 'text'
-  | 'time'
-  | 'timetz'
-  | 'timestamp'
-  | 'timestamptz'
-  | 'tsquery'
-  | 'tsvector'
-  | 'txid_snapshot'
-  | 'uuid'
-  | 'xml';
-//from canvas.tsx
-
-// export interface CanvasProps {
-//   fetchedData: {
-//     [key: string]: {
-//       [key: string]: {
-//         IsForeignKey: boolean;
-//         IsPrimaryKey: boolean;
-//         Name: string;
-//         References: any[];
-//         TableName: string;
-//         Value: string | boolean | number; //originally any, check if value works
-//         additional_constraints: string | null;
-//         data_type: string;
-//         field_name: string;
-//       };
-//     };
-//   };
-//   tableId?: string; //originally any, check if value works
-//   isLoadingProps: boolean;
-//   isErrorProps: boolean;
-//   setFetchedData: (fetchedData: object) => void;
-//   setSideBarOpened: (param: boolean) => void;
-//   reference: any;
-//   setSqlOpen: (sqlOpen: boolean) => void;
-//   sqlOpen: boolean;
-// }
-
-// //from displayheader.tsx
-// export interface DisplayHeaderProps {
-//   menuPopUpOpened: boolean;
-//   name: string | null;
-//   picture: string | null | undefined;
-//   setMenuPopUpOpened: (opened: boolean) => void;
-//   setUser: (user: object /*originally any */) => void;
-// }
-
-// //from featuretab.tsx
-// export interface FeatureTabProps {
-//   setTablename: (e: string) => void;
-//   fetchedData: {};
-//   setFetchedData: (e: {}) => void;
-//   setSideBarOpened: (param: boolean) => void;
-//   screenshot: any;
-// }
-
-// //from menupopup.tsx
-// export interface MenuPopUpProps {
-//   opened: boolean;
-//   setOpened: (opened: boolean) => void;
-// }
-
-// //from sidebar.tsx
-// export interface SideBarProps {
-//   isLoadingProps: boolean;
-//   isErrorProps: boolean;
-//   mutate: (data: object) => void;
-//   sideBarOpened: boolean;
-//   setSideBarOpened: (param: boolean) => void;
-// }
-
-// // from homeloggedinnavbar.tsx
-// export interface HomeLoggedInNavbarProps {
-//   user: {
-//     email: string | null;
-//     id: string | null;
-//     name: string | null;
-//     picture: string | null;
-//   };
-//   setUser: (user: object /*originally any */) => void;
-// }

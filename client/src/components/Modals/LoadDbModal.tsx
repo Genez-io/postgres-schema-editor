@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import axios from 'axios';
 import useSchemaStore from '../../store/schemaStore.js';
-import useDataStore from '../../store/dataStore.js';
 import useSettingsStore from '../../store/settingsStore.js';
 
 export default function LoadDbModal({
@@ -12,7 +11,6 @@ export default function LoadDbModal({
   dbId: string
 }) {
   const setSchemaStore = useSchemaStore((state:any) => state.setSchemaStore);
-  const setDataStore = useDataStore((state:any) => state.setDataStore);
   const { setWelcome } = useSettingsStore((state:any) => state);
 
   const loadSchema = async () => {
@@ -36,7 +34,6 @@ export default function LoadDbModal({
       })
       .catch((err: ErrorEvent) => console.error('getSchema error', err));
     setSchemaStore(dataFromBackend.schema);
-    setDataStore(dataFromBackend.data);
     setWelcome(false);
     closeLoadDbModal();
   }

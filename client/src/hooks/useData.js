@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import alasql from "alasql";
 import toast from "react-hot-toast";
 
 const runQuery = async (q) => {
@@ -29,7 +28,7 @@ const runQuery = async (q) => {
   }
 }
 
-const fetchTableNames = async (dbId) => {
+const fetchTableNames = async () => {
   try {
     const dbId = window.location.href.replace(/.*data\//, '')
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/sql/postgres/tableNames`, {

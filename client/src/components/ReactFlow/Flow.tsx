@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import ReactFlow, {
   Controls,
   ControlButton,
-  Background,
   ReactFlowProps,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
@@ -96,12 +95,12 @@ export default function Flow(): JSX.Element {
         fitView
       >
         <div id="download-image"></div>
-        <Background className=" transition-colors duration-500 dark:bg-black" />
         <Controls position="top-right">
           <ControlButton>
             <DownloadButton />
           </ControlButton>
         </Controls>
+
       </ReactFlow>
     </div>
   );

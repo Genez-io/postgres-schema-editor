@@ -10,7 +10,6 @@ import FeatureTab from '../components/DBDisplay/FeatureTab';
 import AddReference from '../components/DBDisplay/AddReference';
 import Flow from '../components/ReactFlow/Flow';
 import InputModal from '../components/Modals/InputModal';
-import DataInputModal from '../components/Modals/DataInputModal';
 import DeleteTableModal from '../components/Modals/DeleteTableModal';
 import useSettingsStore from '../store/settingsStore.js';
 
@@ -25,8 +24,6 @@ const DBDisplay: React.FC = () => {
     editRefMode,
     inputModalState,
     setInputModalState,
-    inputDataModalState,
-    setDataInputModalState,
     deleteTableModalState,
     setDeleteTableModalState,
     currentTable
@@ -63,14 +60,6 @@ const DBDisplay: React.FC = () => {
             mode={inputModalState.mode as 'table' | 'column'}
             tableNameProp={currentTable}
             closeInputModal={() => setInputModalState(false)}
-            dbId={dbId}
-          />
-        ) : null}
-        {inputDataModalState.isOpen ? (
-          <DataInputModal
-            mode={inputModalState.mode}
-            tableNameProp={currentTable}
-            closeDataInputModal={() => setDataInputModalState(false)}
             dbId={dbId}
           />
         ) : null}

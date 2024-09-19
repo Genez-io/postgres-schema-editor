@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { TableColumns, TableColumn, TableSchema, RefObj } from '../Types.js';
+import { TableColumn, TableSchema, RefObj } from '../Types.js';
 import { postgresSchemaQuery, postgresForeignKeyQuery } from './queries/postgres.queries.js';
 import {
   dbConnect,
@@ -17,7 +17,6 @@ import {
   query,
   tableSchema
 } from './helperFunctions/universal.helpers.js';
-import { resourceLimits } from 'worker_threads';
 
 // Object containing all of the middleware
 const postgresController = {
@@ -25,7 +24,7 @@ const postgresController = {
   postgresExecuteQuery: async (req: Request, res: Response, next: any) => {
     const result = await Promise.resolve(query(req, res, next));
     res.locals.rows = result;
-    const matches = req.body.query.match(/^\s*select\s+\*\s+from\s+\"?([^"\s]*)\"?\s*$/i);
+    const matches = req.body.query.match(/^\s*select\s+\*\s+from\s+"?([^"\s]*)"?\s*$/i);
     if (matches) {
       const tName = matches[1];
       const ts = await Promise.resolve(tableSchema(req, tName));

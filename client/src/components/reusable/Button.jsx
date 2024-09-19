@@ -1,5 +1,8 @@
 import React from "react";
-import { classNames } from "../../modules/misc/index.js";
+
+function classNames(...classes) {
+  return classes.filter(Boolean).join(" ");
+}
 
 export const Button = ({ children, className, handleClick }) => {
   return (

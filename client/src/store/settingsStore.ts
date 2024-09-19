@@ -21,14 +21,6 @@ const settingsStore = (
       false,
       'setDisplayNavBar in settingsStore'
     ),
-  darkMode: true,
-  setDarkMode: () =>
-    set(
-      (state: { darkMode: boolean }) => ({ ...state, darkMode: !state.darkMode }),
-      false,
-      'setDarkMode in settingsStore'
-    ),
-
   sidebarDisplayState: false,
   setSidebarDisplayState: () =>
     set(
@@ -74,23 +66,6 @@ const settingsStore = (
       }),
       false,
       'setInputModalState in /settingsStore'
-    );
-  },
-
-  inputDataModalState: { isOpen: false, mode: '' },
-  setDataInputModalState: (
-    isOpen: boolean,
-    mode: string = '',
-    currentTable: string = ''
-  ) => {
-    set(
-      (state) => ({
-        ...state,
-        currentTable,
-        inputDataModalState: { isOpen, mode },
-      }),
-      false,
-      'setDataInputModalState in /settingsStore'
     );
   },
 

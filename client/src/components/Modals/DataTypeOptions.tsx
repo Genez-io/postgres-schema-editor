@@ -1,5 +1,5 @@
 export default function DataTypeOptions() {
-  let dataTypeArr: string[] = [
+  const dataTypeArr: string[] = [
     'bigint',
     'bigserial',
     'bit',
@@ -64,4 +64,4 @@ export default function DataTypeOptions() {
     </option>
   ));
   return <>{optionsArr}</>;
-};
+}

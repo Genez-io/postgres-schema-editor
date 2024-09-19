@@ -233,7 +233,7 @@ const useSchemaStore = create<SchemaState>()(
           checkNameValidity(tableName);
 
           // Check against current state
-          if (get().schemaStore.hasOwnProperty(tableName))
+          if (get().schemaStore[tableName])
             throw new Error(`Schema already contains table named "${tableName}"`);
 
           // If columnDataArr is being passed as arg, that means the table is being initialized
@@ -253,7 +253,7 @@ const useSchemaStore = create<SchemaState>()(
 
           for (const column of columnDataArr) {
             // Check for duplicates against current state
-            if (currentTable.hasOwnProperty(column.name))
+            if (currentTable[column.name])
               throw new Error(
                 `Table "${tableName}" already contains column named "${column.name}"`
               );
@@ -293,7 +293,7 @@ const useSchemaStore = create<SchemaState>()(
           const restrictedNames = get()._restrictedPgNames;
           if (!name || name.length < 1) throw new Error('Names must not be empty');
 
-          if (restrictedNames.hasOwnProperty(name.toUpperCase()))
+          if (restrictedNames[name.toUpperCase()])
             throw new Error(
               `Table and column names must not be ${system} syntax (cause: "${name}")`
             );

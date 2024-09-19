@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { SQLDataType, ColumnData } from '../../Types';
 import ColumnInput from './ColumnInput';
 import useSchemaStore from '../../store/schemaStore.js';
-import useDataStore from '../../store/dataStore.js';
 
 //closeInputModal
 
@@ -40,7 +39,6 @@ export default function InputModal({
   // AFTERWARDS, PK MAY NOT BE EDITED
 
   const { setSchemaStore } = useSchemaStore((state:any) => state);
-  const { setDataStore } = useDataStore((state:any) => state);
 
   const initialTable: string = 'untitled_table'; //for adding new table
   const initialColumns: ColumnData[] = [
@@ -98,7 +96,6 @@ export default function InputModal({
           .then((responseData) => responseData.json())
           .then((parsedData) => {
             setSchemaStore(parsedData.schema);
-            setDataStore(parsedData.data);
           });
       } else if (mode === 'column') {
         addColumnSchema(tableName, columnData);

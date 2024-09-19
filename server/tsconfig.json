@@ -11,8 +11,10 @@
         "outDir": "build",
         "rootDir": ".",
         "strict": true,
-        "noImplicitAny": true,
+        "noUnusedLocals": true,
+        "noFallthroughCasesInSwitch": true,
         "esModuleInterop": true,
+        "skipLibCheck": true,
         "resolveJsonModule": true,
         "allowJs": true,
         "types": [
@@ -22,6 +24,7 @@
     "include": [
         "**/*",
         "package.json"
-    ]
+    ],
+    "exclude": ["node_modules", "build"]
 }
 

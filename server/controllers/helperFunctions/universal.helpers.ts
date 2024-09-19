@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { RequestHandler, Request, Response, NextFunction } from 'express';
 import pg from 'pg'
 const { Pool } = pg
@@ -78,8 +79,6 @@ export const dbConnect = async (req: Request) => {
 
 export const query: RequestHandler = async (
   req: Request,
-  _res: Response,
-  next
 ) => {
   const dbDataSource = await dbConnect(req);
   const { query } = req.body;
@@ -288,7 +287,7 @@ export const deleteColumn: RequestHandler = async (
 
   try {
     if (constraintName) {
-      let query = `
+      const query = `
         ALTER TABLE "${tableName}" 
         DROP CONSTRAINT ${constraintName};
         `;
@@ -349,9 +348,9 @@ export const getTableNames: RequestHandler = async (
 ) => {
   const dbDataSource = await dbConnect(req);
   try {
-    let query: string = "SELECT tableName FROM pg_catalog.pg_tables WHERE schemaname = 'public'"; // Postgres
+    const query: string = "SELECT tableName FROM pg_catalog.pg_tables WHERE schemaname = 'public'"; // Postgres
 
-    const tableNameList: any = await dbDataSource.query(query);
+    const tableNameList:any = await dbDataSource.query(query);
 
     const tables: (string | undefined)[] = tableNameList.map((obj: any) => {
       return obj.tablename; // Postgres

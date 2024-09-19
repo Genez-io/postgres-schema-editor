@@ -16,8 +16,8 @@ export default function createNodes(
     sp = JSON.parse(spStr);
   }
 
-  let nodeWidth = 500;
-  let direction = 'TB';
+  const nodeWidth = 500;
+  const direction = 'TB';
 
   const dagreGraph = new dagre.graphlib.Graph();
   dagreGraph.setDefaultEdgeLabel(() => ({}));
@@ -54,7 +54,7 @@ export default function createNodes(
 
     dagre.layout(dagreGraph);
 
-    let storedPositions:any = {};
+    const storedPositions:any = {};
 
     nodes.forEach((node) => {
       const nodeWithPosition = dagreGraph.node(node.id);

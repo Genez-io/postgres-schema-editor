@@ -1,5 +1,5 @@
-import { SQLDataType, ColumnData } from '../../Types';
-import DataTypeOptions from './DataTypeOptions';
+import { SQLDataType, ColumnData } from '../../Types.js';
+import DataTypeOptions from './DataTypeOptions.js';
 
 type ColumnInputProps = {
   index: number;
@@ -31,8 +31,7 @@ function ColumnInput({
   mode,
 }: ColumnInputProps) {
 
-  let maxConstraintNameLength: number;
-  maxConstraintNameLength = 63; //Postgres
+  const maxConstraintNameLength: number = 63;
 
   return (
     <div className="column-input">
