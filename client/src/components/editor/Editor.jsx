@@ -21,7 +21,6 @@ const Editor = ({ query, setQuery, isOpen, schema }) => {
 
   const onSelectStatement = () => {
     let query = `SELECT * FROM "${tableName}"`;
-
     setValue(query);
   };
 

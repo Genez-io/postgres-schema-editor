@@ -1,4 +1,4 @@
-import React, { useState, Suspense } from "react";
+import React, { useState, Suspense, useRef } from "react";
 import "../assets/output.css";
 import { Toaster } from "react-hot-toast";
 import Loader from "../components/reusable/Loader.jsx";
@@ -15,6 +15,7 @@ const DBData = () => {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(true);
   const [schema, setSchema] = useState([]);
+  const navigationMenuRef = useRef();
 
   return (
     <>
@@ -51,6 +52,7 @@ const DBData = () => {
             setQuery={setQuery}
             isOpen={isOpen}
             setIsOpen={setIsOpen}
+            ref={navigationMenuRef}
           />
           <Editor
             setQuery={setQuery}
@@ -63,6 +65,7 @@ const DBData = () => {
               query={query}
               setSchema={setSchema}
               isOpen={isOpen} 
+              navigationMenuRef={navigationMenuRef}
             /> : null}
           <Footer isOpen={isOpen} />
         </Suspense>

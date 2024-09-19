@@ -1,10 +1,10 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import {useData} from "../../hooks/useData";
 import Table from "./Table.jsx";
 
 import Loader from "../../assets/loader.svg";
 
-const TableSection = React.memo(({ query, isOpen, setSchema }) => {
+const TableSection = React.memo(({ query, isOpen, setSchema, navigationMenuRef }) => {
   const { data, schema, loading, runtime, error } = useData(query);
 
   const columns = useMemo(() => {
@@ -24,9 +24,16 @@ const TableSection = React.memo(({ query, isOpen, setSchema }) => {
         Header: columnName,
         accessor: columnName,
       }));
-      
     }
   }, [data, schema]);
+
+  useEffect(() => {
+    if (loading == false) {
+      if (query.match(/^\s*(create|drop)\s+table\s+/i)) {
+        navigationMenuRef.current.refreshTables();
+      } 
+     }
+  }, [loading]);
 
   if (error)
     return (

@@ -1,18 +1,27 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useImperativeHandle, forwardRef } from 'react';
 import {fetchTableNames} from "../../hooks/useData";
 
-const Navbar = React.memo(({ setQuery, isOpen, setIsOpen }) => {
+const Navbar = forwardRef(({ setQuery, isOpen, setIsOpen }, ref) => {
   const [TABLE_NAMES, setTableNames] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
 
-  useEffect(() => {
+  const refreshTables = (loadFirst) => {
     fetchTableNames().then((data) => {
       setTableNames(data);
-      if (data.length > 0) {
+      if (loadFirst && data.length > 0) {
         handleQuery(data[0]);
       }
       setLoading(false);
     });
+  };
+
+  useImperativeHandle(ref, () => ({
+    refreshTables,
+  }));
+
+
+  useEffect(() => {
+    refreshTables(true);
   }, []);
 
   const handleQuery = (tableName) => {
@@ -114,4 +123,4 @@ const Navbar = React.memo(({ setQuery, isOpen, setIsOpen }) => {
   );
 });
 
-export default Navbar;
+export default React.memo(Navbar);
