@@ -18,15 +18,49 @@ class Pool2 extends Pool{
   constructor(d: any) {
     super(d);
   }
+
+  flattenObject(
+    obj: any,
+    parentKey: string = '',
+    result: { [key: string]: any } = {}
+  ): { [key: string]: any } {
+    for (const key in obj) {
+      if (!Object.prototype.hasOwnProperty.call(obj, key)) continue;
+  
+      const propName = parentKey ? `${parentKey}.${key}` : key;
+      const value = obj[key];
+  
+      if (
+        value === null ||
+        typeof value !== 'object' ||
+        value instanceof Date
+      ) {
+        // Primitive value or Date object, assign directly
+        result[propName] = value;
+      } else if (Buffer.isBuffer(value)) {
+        // Convert Buffer to hex string
+        result[propName] = value.toString('hex');
+      } else if (Array.isArray(value)) {
+        // Serialize arrays to JSON strings
+        result[propName] = JSON.stringify(value);
+      } else {
+        // Nested object, recurse
+        this.flattenObject(value, propName, result);
+      }
+    }
+    return result;
+  }  
+
   override async query(query: any, values?: any): Promise<any> {
     // Add any additional logic here if needed
     console.log("query: ", query);
     if (values)
       console.log("values: ", values);
 
-    const q = await super.query(query, values);
+    let q: any = await super.query(query, values);
     if (q.rows)
-      return q.rows;
+      q = q.rows.map((row: any) => this.flattenObject(row));
+
     return q;
   }
 }

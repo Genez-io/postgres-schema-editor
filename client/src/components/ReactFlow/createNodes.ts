@@ -57,11 +57,15 @@ export default function createNodes(
     const storedPositions:any = {};
 
     nodes.forEach((node) => {
-      const nodeWithPosition = dagreGraph.node(node.id);
+      let nodeWithPosition:any = dagreGraph.node(node.id);
       // node.targetPosition = isHorizontal ? 'left' : 'top';
       // node.sourcePosition = isHorizontal ? 'right' : 'bottom';
 
       // We are shifting the dagre node position (anchor=center center) to the top left
+      while (nodeWithPosition.x > 2000) {
+        nodeWithPosition.x -= 2000;
+        nodeWithPosition.y += 200;
+      }
       node.position = {
         x: nodeWithPosition.x - nodeWithPosition.width / 2,
         y: nodeWithPosition.y - nodeWithPosition.height / 2,
