@@ -1,1 +1,1 @@
-Postgres Schema and Data editor, deployed on Genezio
+Postgres Schema and Data editor, deployed on Genezio.com
