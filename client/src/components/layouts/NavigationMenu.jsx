@@ -19,7 +19,6 @@ const Navbar = forwardRef(({ setQuery, isOpen, setIsOpen }, ref) => {
     refreshTables,
   }));
 
-
   useEffect(() => {
     refreshTables(true);
   }, []);

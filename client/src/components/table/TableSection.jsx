@@ -30,7 +30,7 @@ const TableSection = React.memo(({ query, isOpen, setSchema, navigationMenuRef }
   useEffect(() => {
     if (loading == false) {
       if (query.match(/^\s*(create|drop)\s+table\s+/i)) {
-        navigationMenuRef.current.refreshTables();
+        navigationMenuRef.current.refreshTables(false);
       } 
      }
   }, [loading]);
